@@ -147,11 +147,17 @@ comm (succ x) y = (cong succ (comm x y)) ~ (sx+y=x+sy y x)
 -- Define multiplication:
 infixl 30 _*_
 _*_ : ℕ → ℕ → ℕ
-_*_ = {!!}
+_*_ zero y = zero
+_*_ (succ x) y = y + (x * y)
 
 -- (**) Prove its properties:
+y=y*1 : (y : ℕ) → y ≡ y * (succ zero)
+y=y*1 zero = refl
+y=y*1 (succ y) = lemma-succ (y=y*1 y)
+
 assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
-assoc* = {!!}
+assoc* zero y z = refl
+assoc* (succ x) y z = {!!}
 
 comm* : (x y : ℕ) → x * y ≡ y * x
 comm* = {!!}
