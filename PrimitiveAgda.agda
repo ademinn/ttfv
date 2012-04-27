@@ -155,6 +155,20 @@ y=y*1 : (y : ℕ) → y ≡ y * (succ zero)
 y=y*1 zero = refl
 y=y*1 (succ y) = lemma-succ (y=y*1 y)
 
+lemma-plus-z : {x y : ℕ} → x ≡ y → (z : ℕ) → z + x ≡ z + y
+lemma-plus-z refl _ = refl
+
+plus : (z : ℕ) → (ℕ → ℕ)
+plus z = λ x → z + x
+
+--rassoc : (x y z : ℕ) → (x + y) + z ≡ x + (y + z)
+--rassoc zero y z = refl
+--rassoc (succ x) y z = lemma-succ (rassoc x y z)
+
+distr : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
+distr zero y z = refl
+distr (succ x) y z = {!!}--cong (_+_ z) (distr x y z)
+
 assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
 assoc* (succ x) y z = {!!}
