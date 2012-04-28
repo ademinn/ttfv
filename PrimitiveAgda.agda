@@ -147,6 +147,10 @@ _*_ zero y = zero
 _*_ (succ x) y = y + (x * y)
 
 -- (**) Prove its properties:
+0=y*0 : (y : ℕ) → zero ≡ y * zero
+0=y*0 zero = refl
+0=y*0 (succ y) = 0=y*0 y
+
 y=y*1 : (y : ℕ) → y ≡ y * (succ zero)
 y=y*1 zero = refl
 y=y*1 (succ y) = lemma-succ (y=y*1 y)
@@ -161,17 +165,17 @@ _$_ : {a b : Set} → (a → b) → a → b
 f $ x = f x
 infixr 0 _$_
 
-
 distr : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
 distr zero y z = refl
 distr (succ x) y z = (cong (_+_ z) $ (distr x y z)) ~ (assoc z (x * z) (y * z))
 
 assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
-assoc* (succ x) y z = {!!}
+assoc* (succ x) y z = (cong (_+_ (y * z)) $ (assoc* x y z)) ~ (≡-refl $ (distr y (x * y) z))
 
 comm* : (x y : ℕ) → x * y ≡ y * x
-comm* = {!!}
+comm* zero y = 0=y*0 y
+comm* (succ x) y = (cong (_+_ y) $ (comm* x y)) ~ (≡-refl $ {!!})
 
 -------------------------------------------
 -- Emulating type classes.
