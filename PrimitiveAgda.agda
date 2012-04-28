@@ -165,13 +165,17 @@ _$_ : {a b : Set} → (a → b) → a → b
 f $ x = f x
 infixr 0 _$_
 
-distr : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
-distr zero y z = refl
-distr (succ x) y z = (cong (_+_ z) $ (distr x y z)) ~ (assoc z (x * z) (y * z))
+ldistr : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
+ldistr zero y z = refl
+ldistr (succ x) y z = (cong (_+_ z) $ (ldistr x y z)) ~ (assoc z (x * z) (y * z))
 
 assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
-assoc* (succ x) y z = (cong (_+_ (y * z)) $ (assoc* x y z)) ~ (≡-refl $ (distr y (x * y) z))
+assoc* (succ x) y z = (cong (_+_ (y * z)) $ (assoc* x y z)) ~ (≡-refl $ (ldistr y (x * y) z))
+
+rdistr : (x y z : ℕ) → x * (y + z) ≡ x * y + x * z
+rdistr zero y z = refl
+rdistr (succ x) y z = {!!}
 
 comm* : (x y : ℕ) → x * y ≡ y * x
 comm* zero y = 0=y*0 y
