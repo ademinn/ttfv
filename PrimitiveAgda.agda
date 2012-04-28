@@ -135,10 +135,6 @@ sx+y=x+sy : (x y : ℕ) → succ x + y ≡ x + succ y
 sx+y=x+sy zero y = refl
 sx+y=x+sy (succ x) y = cong succ (sx+y=x+sy x y)
 
-sx+y=sx+sy : (x y : ℕ) →  succ x + y ≡ succ (x + y)
-sx+y=sx+sy zero x = refl
-sx+y=sx+sy (succ x) y = cong succ (sx+y=sx+sy x y)
-
 -- (*) Commutativity.
 comm : (x y : ℕ) → x + y ≡ y + x
 comm zero y = y=y+0 y
@@ -161,13 +157,14 @@ lemma-plus-z refl _ = refl
 plus : (z : ℕ) → (ℕ → ℕ)
 plus z = λ x → z + x
 
---rassoc : (x y z : ℕ) → (x + y) + z ≡ x + (y + z)
---rassoc zero y z = refl
---rassoc (succ x) y z = lemma-succ (rassoc x y z)
+_$_ : {a b : Set} → (a → b) → a → b
+f $ x = f x
+infixr 0 _$_
+
 
 distr : (x y z : ℕ) → (x + y) * z ≡ x * z + y * z
 distr zero y z = refl
-distr (succ x) y z = {!!}--cong (_+_ z) (distr x y z)
+distr (succ x) y z = (cong (_+_ z) $ (distr x y z)) ~ (assoc z (x * z) (y * z))
 
 assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
