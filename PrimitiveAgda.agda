@@ -155,12 +155,6 @@ y=y*1 : (y : ℕ) → y ≡ y * (succ zero)
 y=y*1 zero = refl
 y=y*1 (succ y) = lemma-succ (y=y*1 y)
 
-lemma-plus-z : {x y : ℕ} → x ≡ y → (z : ℕ) → z + x ≡ z + y
-lemma-plus-z refl _ = refl
-
-plus : (z : ℕ) → (ℕ → ℕ)
-plus z = λ x → z + x
-
 _$_ : {a b : Set} → (a → b) → a → b
 f $ x = f x
 infixr 0 _$_
@@ -173,13 +167,16 @@ assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
 assoc* (succ x) y z = (cong (_+_ (y * z)) $ (assoc* x y z)) ~ (≡-refl $ (ldistr y (x * y) z))
 
+lemma-plus-z : {x y z : ℕ} → x ≡ y → (z : ℕ) → x + z ≡ y + z
+lemma-plus-z refl z = cong ((λ z a → a + z) z) refl
+
 rdistr : (x y z : ℕ) → x * (y + z) ≡ x * y + x * z
 rdistr zero y z = refl
-rdistr (succ x) y z = {!!}
+rdistr (succ x) y z = (≡-refl $ assoc y z (x * (y + z))) ~ (cong (_+_ y) $ ((((cong (_+_ z) $ (rdistr x y z)) ~ (assoc z (x * y) (x * z))) ~ (lemma-plus-z (comm z (x * y)) (x * z))) ~ (≡-refl $ (assoc (x * y) z (x * z) ))) ) ~ (assoc y (x * y) (z + x * z))
 
 comm* : (x y : ℕ) → x * y ≡ y * x
 comm* zero y = 0=y*0 y
-comm* (succ x) y = (cong (_+_ y) $ (comm* x y)) ~ (≡-refl $ {!!})
+comm* (succ x) y = (cong (_+_ y) $ (comm* x y)) ~ (≡-refl $ (rdistr y (succ zero) (x)) ~ lemma-plus-z (≡-refl (y=y*1 y)) (y * x))
 
 -------------------------------------------
 -- Emulating type classes.
