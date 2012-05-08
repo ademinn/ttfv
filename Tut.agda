@@ -113,3 +113,15 @@ vmap2 : {A B : Set} (n : Nat) → (A → B) → Vec2 A n → Vec2 B n
 vmap2 .zero f nil = nil
 vmap2 .(suc n) f (cons n x xl) = cons n (f x) (vmap2 n f xl)
 
+data Image_⋑_ { A B : Set } (f : A → B) : B → Set where
+  im : (x : A) → Image f ⋑ f x
+
+inv : {A B : Set} (f : A → B) (y : B) → Image f ⋑ y → A
+inv f .(f x) (im x) = x
+
+data Fin : Nat → Set where
+  fzero : {n : Nat} → Fin (suc n)
+  fsuc : {n : Nat} → (i : Fin n) → Fin (suc n)
+
+data Empty : Set where
+  empty : Fin zero → Empty
