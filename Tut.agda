@@ -80,9 +80,9 @@ false' = silly {x = false}
 one : Nat
 one = identity _ (suc zero)
 
-_◯_ : {A : Set} {B : A → Set} {C : (x : A) → B x → Set}
+_∘_ : {A : Set} {B : A → Set} {C : (x : A) → B x → Set}
          (f : {x : A} (y : B x) → C x y) (g : (x : A) → B x) (x : A) → C x (g x)
-(f ◯ g) x = f(g x)
+(f ∘ g) x = f(g x)
 
 map : {A B : Set} → (A → B) → List A → List B
 map f []        = []
@@ -113,10 +113,10 @@ vmap2 : {A B : Set} (n : Nat) → (A → B) → Vec2 A n → Vec2 B n
 vmap2 .zero f nil = nil
 vmap2 .(suc n) f (cons n x xl) = cons n (f x) (vmap2 n f xl)
 
-data Image_⋑_ { A B : Set } (f : A → B) : B → Set where
-  im : (x : A) → Image f ⋑ f x
+data Image_∋_ { A B : Set } (f : A → B) : B → Set where
+  im : (x : A) → Image f ∋ f x
 
-inv : {A B : Set} (f : A → B) (y : B) → Image f ⋑ y → A
+inv : {A B : Set} (f : A → B) (y : B) → Image f ∋ y → A
 inv f .(f x) (im x) = x
 
 data Fin : Nat → Set where
@@ -125,3 +125,12 @@ data Fin : Nat → Set where
 
 data Empty : Set where
   empty : Fin zero → Empty
+
+_!_ : {n : Nat} {A : Set} → Vec A n → Fin n → A
+[] ! ()
+(x :: xs) ! fzero = x
+(x :: xs) ! (fsuc i) = xs ! i
+
+tabulate : {n : Nat} {A : Set} → (Fin n → A) → Vec A n
+tabulate {zero} f = []
+tabulate {suc n} f = (f fzero) :: tabulate (f ∘ fsuc)
