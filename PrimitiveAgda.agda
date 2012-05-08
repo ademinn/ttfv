@@ -326,4 +326,9 @@ n-0=n (succ n) = refl
 
 splitn : ∀ {A} {n : ℕ} → (l : List A) → (n ≤ length l) → Vec A n × Vec A ((length l) - n)
 splitn {n = zero} l p = [0] , fst (cuthead {n = length l - zero} l (left (n-0=n (length l))))
-splitn {n = succ k} l p = {!!}
+splitn {n = succ k} [] (left ())
+splitn {n = succ k} [] (right ())
+splitn {n = succ k} (lf ∷ ls) (left rfl) = (lf :: (fst oldsn)) , (snd oldsn)
+  where oldsn = splitn {n = k} ls (left (lemma-unsucc rfl))
+splitn {n = succ k} (lf ∷ ls) (right (s<s lss)) = (lf :: (fst oldsn)) , (snd oldsn)
+  where oldsn = splitn {n = k} ls (right lss)
