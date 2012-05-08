@@ -256,7 +256,8 @@ data Fin : ℕ → Set where
 
 -- Get an element from a Vec by its number.
 lookup : ∀ {A n} → Fin n → Vec A n → A
-lookup = {!!}
+lookup fzero (a :: as) = a
+lookup (fsucc sn) (a :: as) = a
 
 -- try this:
 --test1 = head [0]
@@ -287,7 +288,13 @@ a ≤ b = Either (a ≡ b) (a < b)
 -- (**) If you give me a list and a proof that its length is less than n
 -- I'll give you a tuple (prefix of length n, suffix)
 cuthead : ∀ {A} {n : ℕ} → (l : List A) → n ≤ length l → Vec A n × List A
-cuthead = {!!}
+cuthead {n = zero} l p = [0] , l
+cuthead {n = succ k} [] (left ())
+cuthead {n = succ k} [] (right ())
+cuthead {n = succ k} (lf ∷ ls) (left rfl) = (lf :: (fst oldch)) , (snd oldch)
+  where oldch = cuthead {n = k} ls (left (lemma-unsucc rfl))
+cuthead {n = succ k} (lf ∷ ls) (right (s<s lss)) = (lf :: (fst oldch)), (snd oldch)
+  where oldch = cuthead {n = k} ls (right lss)
 
 -- (***) Previous definition is not total (e.g. you can make up any suffix).
 -- Define a better one.
