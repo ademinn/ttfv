@@ -30,7 +30,10 @@ data Either3 (A B C : Set) : Set where
   right  : C → Either3 A B C
 
 -- \::-
---_∺_ : 
+_∺_ : ∀ {n n₁ n₂} → (x : Coin) → (CoinTFLHList n n₁ n₂) → (Either3 (CoinTFLHList (suc n) n₁ n₂) (CoinTFLHList n (suc n₁) n₂) (CoinTFLHList n n₁ (suc n₂)))
+CTrue ∺ CL = left (+T CL)
+CFalseLight ∺ CL = middle (+FL CL)
+CFalseHeavy ∺ CL = right (+FH CL)
 
 {--
 C[_] :  → Coin → CoinTFLHList ℕ ℕ ℕ
