@@ -1,4 +1,4 @@
-module simplemath where
+module SimpleMath where
 
 data Coin : Set where
   CTrue CFalseLight CFalseHeavy : Coin
