@@ -1,5 +1,7 @@
 module SimpleMath where
 
+open import Data.Nat
+
 data Coin : Set where
   CTrue CFalseLight CFalseHeavy : Coin
 
