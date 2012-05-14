@@ -167,8 +167,8 @@ assoc* : (x y z : ℕ) → x * (y * z) ≡ (x * y) * z
 assoc* zero y z = refl
 assoc* (succ x) y z = (cong (_+_ (y * z)) $ (assoc* x y z)) ~ (≡-refl $ (ldistr y (x * y) z))
 
-lemma-plus-z : {x y z : ℕ} → x ≡ y → (z : ℕ) → x + z ≡ y + z
-lemma-plus-z refl z = cong ((λ z a → a + z) z) refl
+lemma-plus-z : {x y : ℕ} → x ≡ y → (z : ℕ) → x + z ≡ y + z
+lemma-plus-z refl z = refl
 
 rdistr : (x y z : ℕ) → x * (y + z) ≡ x * y + x * z
 rdistr zero y z = refl
