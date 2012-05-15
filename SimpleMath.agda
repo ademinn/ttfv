@@ -35,10 +35,11 @@ CTrue ∺ CL = left (+T CL)
 CFalseLight ∺ CL = middle (+FL CL)
 CFalseHeavy ∺ CL = right (+FH CL)
 
-
+-- Singleton
 C[_] : (x : Coin) → (Either3 (CoinTFLHList (suc zero) zero zero) (CoinTFLHList zero (suc zero) zero) (CoinTFLHList zero zero (suc zero)))
 C[ x ] = x ∺ C[]
 
+-- Concat
 _C++_ : ∀ {n₁ n₂ n₁₁ n₁₂ n₂₁ n₂₂} → (CoinTFLHList n₁ n₁₁ n₁₂) → (CoinTFLHList n₂ n₂₁ n₂₂) → (CoinTFLHList (n₁ + n₂) (n₁₁ + n₂₁) (n₁₂ + n₂₂))
 C[] C++ CL₂       = CL₂
 (+T_ y) C++ CL₂  = +T (y C++ CL₂)
