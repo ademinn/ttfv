@@ -4,6 +4,7 @@ open import Data.List
 open import Data.String
 open import Level
 
+-- ↝ \r~
 infixr 5 _⇝_
 data Type : Set where
   con : String → Type
@@ -11,21 +12,26 @@ data Type : Set where
 
 TList = List Type
 
+-- ∈ is \in
 infixr 4 _∈_
 
 data _∈_ {a} {A : Set a} : A → List A → Set a where
   Z : ∀ {x xs} → x ∈ (x ∷ xs)
   S : ∀ {x y xs} → (n : x ∈ xs) → x ∈ (y ∷ xs)
 
+-- ∙ is \.
+-- ∷ is \::
 infixl 5 _∙_
 data Term (Γ : TList) : Type → Set where
   Var : ∀ {A} → A ∈ Γ → Term Γ A
   Λ   : ∀ {A B} → Term (A ∷ Γ) B → Term Γ (A ⇝ B)
   _∙_ : ∀ {A B} → Term Γ (A ⇝ B) → Term Γ A → Term Γ B
 
+-- ⊆ is \sub=
 _⊆_ : ∀ {a} {A : Set a} → List A → List A → Set a
 xs ⊆ ys = ∀ {x} → x ∈ xs → x ∈ ys
 
+-- ≡ is \==
 data _≡_ {l : Level} {A : Set l} : A → A → Set l where
   Refl : {a : A} → (a ≡ a)
 
@@ -59,7 +65,7 @@ exchange = wk x∷y∷s⊆y∷x∷s
 contraction : ∀ {Γ A B} → Term (A ∷ A ∷ Γ) B → Term (A ∷ Γ) B
 contraction = wk (x∈s,x∷s⊆s Z)
 
--- \+' '
+-- ⊹ is \+' '
 _⊹_ : ∀ {a} {A : Set a} → List A → List A → List A
 l1 ⊹ l2 = Data.List._++_ l1 l2
 infixr 5 _⊹_
