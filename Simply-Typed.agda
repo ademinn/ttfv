@@ -83,5 +83,5 @@ substitution = term-substitution [] _
         var-substitution [] Γ' t (S n) = Var n
         var-substitution (x ∷ Γs) Γ' t Z = Var Z
         var-substitution (x ∷ Γs) Γ' t (S n) = weaking (var-substitution Γs Γ' t n)
-    term-substitution Γ Γ' tm (Λ y) = {!!}
-    term-substitution Γ Γ' tm (y₁ ∙ y₂) = {!!}
+    term-substitution Γ Γ' tm (Λ y) = Λ (term-substitution (_ ∷ Γ) Γ' tm y)
+    term-substitution Γ Γ' tm (y₁ ∙ y₂) = term-substitution Γ Γ' tm y₁ ∙ term-substitution Γ Γ' tm y₂
