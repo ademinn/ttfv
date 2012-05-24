@@ -92,6 +92,10 @@ check : ∀ {Γ P} → Term Γ P → Set
 check ( (Λ _ ) ∙ _ ) = ⊤
 check _ = ⊥
 
-β-reduction : ∀ {Γ P} {t : Term Γ P} → (check t) → Term Γ P
+β-reduction : ∀ {Γ P} (t : Term Γ P) → (check t) → Term Γ P
 --  → ( (Λ (Term (σ ∷ Γ) P) ) ∙ (Term Γ σ) ) → Term Γ P
-β-reduction = {!!}
+β-reduction (Var y) ()
+β-reduction (Λ y) ()
+β-reduction (Var y ∙ y') ()
+β-reduction (y ∙ y' ∙ y0) ()
+β-reduction (Λ y ∙ y') ct = {!!}
