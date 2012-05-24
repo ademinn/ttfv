@@ -8,10 +8,10 @@ open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
 
 -- ↝ \r~
-infixr 5 _⇝_
+infixr 5 _↝_
 data Type : Set where
-  con : String → Type
-  _⇝_ : Type → Type → Type
+  con : String → Type 
+  _↝_ : Type → Type → Type
 
 TList = List Type
 
@@ -20,8 +20,8 @@ TList = List Type
 infixl 5 _∙_
 data Term (Γ : TList) : Type → Set where
   Var : ∀ {A} → A ∈ Γ → Term Γ A
-  Λ   : ∀ {A B} → Term (A ∷ Γ) B → Term Γ (A ⇝ B)
-  _∙_ : ∀ {A B} → Term Γ (A ⇝ B) → Term Γ A → Term Γ B
+  Λ   : ∀ {A B} → Term (A ∷ Γ) B → Term Γ (A ↝ B)
+  _∙_ : ∀ {A B} → Term Γ (A ↝ B) → Term Γ A → Term Γ B
 
 wk : ∀ {Γ Δ A} → (Γ ⊆ Δ) → Term Γ A → Term Δ A
 wk θ (Var y) = Var (θ y)
