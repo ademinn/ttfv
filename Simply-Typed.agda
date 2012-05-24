@@ -88,6 +88,7 @@ substitution = term-substitution [] _
     term-substitution Γ Γ' tm (Λ y) = Λ (term-substitution (_ ∷ Γ) Γ' tm y)
     term-substitution Γ Γ' tm (y₁ ∙ y₂) = term-substitution Γ Γ' tm y₁ ∙ term-substitution Γ Γ' tm y₂
 
+{-
 check : ∀ {Γ P} → Term Γ P → Set
 check ( (Λ _ ) ∙ _ ) = ⊤
 check _ = ⊥
@@ -98,4 +99,5 @@ check _ = ⊥
 β-reduction (Λ y) ()
 β-reduction (Var y ∙ y') ()
 β-reduction (y ∙ y' ∙ y0) ()
-β-reduction (Λ y ∙ y') ct = {!!}
+β-reduction (Λ y₁ ∙ y₂) ct = substitution y₂ y₁
+-}
