@@ -101,3 +101,14 @@ check _ = ⊥
 β-reduction (y ∙ y' ∙ y0) ()
 β-reduction (Λ y₁ ∙ y₂) ct = substitution y₂ y₁
 -}
+
+{-
+data Re : Term → Set where
+  skip2l : ∀ M N → Re M → Re (M ∙ N)
+  skip2r : ∀ M N → Re N → Re (M ∙ N)
+  skipth : ∀ x M → Re M → Re (Λ x ⟶ N)
+  this : ∀ x M N → Re ((Λ x ⟶ M) ∙ N)
+
+applyreduction (M : Preterm) → Re M → PreTerm
+
+-}
