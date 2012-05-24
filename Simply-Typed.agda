@@ -3,6 +3,8 @@ module Simply-Typed where
 open import Data.List
 open import Data.String
 open import Level
+open import Data.Empty using (⊥)
+open import Data.Unit using (⊤)
 
 -- ↝ \r~
 infixr 5 _⇝_
@@ -85,3 +87,11 @@ substitution = term-substitution [] _
         var-substitution (x ∷ Γs) Γ' t (S n) = weaking (var-substitution Γs Γ' t n)
     term-substitution Γ Γ' tm (Λ y) = Λ (term-substitution (_ ∷ Γ) Γ' tm y)
     term-substitution Γ Γ' tm (y₁ ∙ y₂) = term-substitution Γ Γ' tm y₁ ∙ term-substitution Γ Γ' tm y₂
+
+check : ∀ {Γ P} → Term Γ P → Set
+check ( (Λ _ ) ∙ _ ) = ⊤
+check _ = ⊥
+
+β-reduction : ∀ {Γ P} {t : Term Γ P} → (check t) → Term Γ P
+--  → ( (Λ (Term (σ ∷ Γ) P) ) ∙ (Term Γ σ) ) → Term Γ P
+β-reduction = {!!}
