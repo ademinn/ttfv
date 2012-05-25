@@ -70,7 +70,8 @@ check _ = ⊥
 β-reduction (Λ y₁ ∙ y₂) ct = substitution y₂ y₁
 -}
 
-
+data Redex {Γ A} : Term Γ A → Set where
+  skip2l : ∀ {B} {t1 : Term (B ∷ Γ) A} {t2 : Term Γ B} → Redex t1 → Redex ((Λ t1) ∙ t2)
 
 {-
 data Re : Term → Set where
