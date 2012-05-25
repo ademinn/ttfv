@@ -53,8 +53,8 @@ substitution = term-substitution [] _
     term-substitution Γ Γ' tm (Λ y) = Λ (term-substitution (_ ∷ Γ) Γ' tm y)
     term-substitution Γ Γ' tm (y₁ ∙ y₂) = term-substitution Γ Γ' tm y₁ ∙ term-substitution Γ Γ' tm y₂
 
-data Redex {Γ P} : Term Γ P → Set where
-  con : ∀ {σ} (t1 : Term (σ ∷ Γ) P) → (t2 : Term Γ σ) → Redex ((Λ t1) ∙ t2)
+data isRedex {Γ P} : Term Γ P → Set where
+  con : ∀ {σ} (t1 : Term (σ ∷ Γ) P) → (t2 : Term Γ σ) → isRedex ((Λ t1) ∙ t2)
 
 {-
 check : ∀ {Γ P} → Term Γ P → Set
@@ -69,6 +69,8 @@ check _ = ⊥
 β-reduction (y ∙ y' ∙ y0) ()
 β-reduction (Λ y₁ ∙ y₂) ct = substitution y₂ y₁
 -}
+
+
 
 {-
 data Re : Term → Set where
