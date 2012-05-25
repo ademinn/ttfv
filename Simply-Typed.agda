@@ -71,7 +71,8 @@ check _ = ⊥
 -}
 
 data Redex {Γ A} : Term Γ A → Set where
-  skip2l : ∀ {B} {t1 : Term (B ∷ Γ) A} {t2 : Term Γ B} → Redex t1 → Redex ((Λ t1) ∙ t2)
+  skip2l : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → Redex t₁ → Redex ((Λ t₁) ∙ t₂)
+  skip2r : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → Redex t₂ → Redex ((Λ t₁) ∙ t₂)
 
 {-
 data Re : Term → Set where
