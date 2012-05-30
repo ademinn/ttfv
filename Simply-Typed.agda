@@ -85,6 +85,12 @@ data Redex {Γ} : (A : Type) → Term Γ A → Set where
   skip2r  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex σ t₂ → Redex A (t₁ ∙ t₂)
   skip2th : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex A t → Redex (σ ↝ A) (Λ t)
 
+applyRedex : {A : Type} {Γ : TList} {t : Term Γ A} → Redex A t → Term Γ A
+applyRedex (this t₁ t₂)  = substitution t₂ t₁
+applyRedex (skip2l _ t₂ r) = (applyRedex r) ∙ t₂
+applyRedex (skip2r t₁ _ r) = t₁ ∙ (applyRedex r)
+applyRedex (skip2th t r) = Λ (applyRedex r)
+
 {-
 data Re : Term → Set where
   skip2l : ∀ M N → Re M → Re (M ∙ N)
