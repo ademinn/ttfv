@@ -94,9 +94,13 @@ applyReduction (skip2th t r) = Λ (applyReduction r)
 data _→β_ {Γ A} : Term Γ A → Term Γ A → Set where
   reduce : (t : Term Γ A) → (r : Redex A t) → t →β (applyReduction r)
 
+
+Λproof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ) A} → (t₁ →β t₂) → ((Λ t₁) →β (Λ t₂))
+Λproof (reduce t r) = reduce (Λ t) (skip2th t r)
+
 {-
 data Re : Term → Set where
-  skip2l : ∀ M N → Re M → Re (M ∙ N)
+  skip2l : ∀ M N → Re M → Re (M ∙ N)reduce
   skip2r : ∀ M N → Re N → Re (M ∙ N)
   skipth : ∀ x M → Re M → Re (Λ x ⟶ N)
   this : ∀ x M N → Re ((Λ x ⟶ M) ∙ N)
