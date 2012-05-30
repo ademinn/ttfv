@@ -70,14 +70,20 @@ check _ = ⊥
 β-reduction (Λ y₁ ∙ y₂) ct = substitution y₂ y₁
 -}
 
-data Redex {Γ A} : Term Γ A → Set where
-  this   : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → Redex ((Λ t₁) ∙ t₂)
-  skip2l : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → Redex t₁ → Redex ((Λ t₁) ∙ t₂)
-  skip2r : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → Redex t₂ → Redex ((Λ t₁) ∙ t₂)
---  skipth : {s1 s2 : Type} {t : Term (s1 ∷ Γ) s2} {A : s1 ↝ s2} →  Redex (Λ t)
+data TRedex {Γ A} : Term Γ A → Set where
+  this   : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex ((Λ t₁) ∙ t₂)
+  skip2l : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex t₁ → TRedex ((Λ t₁) ∙ t₂)
+  skip2r : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex t₂ → TRedex ((Λ t₁) ∙ t₂)
+--  skipth : {s1 s2 : Type} {t : Term (s1 ∷ Γ) s2} {A : s1 ↝ s2} →  TRedex (Λ t)
 
 data ΛRedex {Γ s1 s2} : Term Γ (s1 ↝ s2) → Set where
   skipth : ∀ {t : Term (s1 ∷ Γ) s2} → ΛRedex (Λ t)
+
+data Redex {Γ} : (A : Type) → Term Γ A → Set where
+  this    : ∀ {σ A} → (t₁ : Term (σ ∷ Γ) A) → (t₂ : Term Γ σ) → Redex A ((Λ t₁) ∙ t₂)
+  skip2l  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex (σ ↝ A) t₁ → Redex A (t₁ ∙ t₂)
+  skip2r  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex σ t₂ → Redex A (t₁ ∙ t₂)
+  skip2th : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex A t → Redex (σ ↝ A) (Λ t)
 
 {-
 data Re : Term → Set where
