@@ -83,20 +83,28 @@ data Redex {Γ} : (A : Type) → Term Γ A → Set where
   this    : ∀ {σ A} → (t₁ : Term (σ ∷ Γ) A) → (t₂ : Term Γ σ) → Redex A ((Λ t₁) ∙ t₂)
   skip2l  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex (σ ↝ A) t₁ → Redex A (t₁ ∙ t₂)
   skip2r  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex σ t₂ → Redex A (t₁ ∙ t₂)
-  skip2th : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex A t → Redex (σ ↝ A) (Λ t)
+  skipth : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex A t → Redex (σ ↝ A) (Λ t)
 
 applyReduction : {A : Type} {Γ : TList} {t : Term Γ A} → Redex A t → Term Γ A
 applyReduction (this t₁ t₂)  = substitution t₂ t₁
 applyReduction (skip2l _ t₂ r) = (applyReduction r) ∙ t₂
 applyReduction (skip2r t₁ _ r) = t₁ ∙ (applyReduction r)
-applyReduction (skip2th t r) = Λ (applyReduction r)
+applyReduction (skipth t r) = Λ (applyReduction r)
 
 data _→β_ {Γ A} : Term Γ A → Term Γ A → Set where
   reduce : (t : Term Γ A) → (r : Redex A t) → t →β (applyReduction r)
 
 
-Λproof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ) A} → (t₁ →β t₂) → ((Λ t₁) →β (Λ t₂))
-Λproof (reduce t r) = reduce (Λ t) (skip2th t r)
+skip2lProof : ∀ {σ Γ A} {t₁ : Term Γ (σ ↝ A)} {t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ →β t₂ → (t₁ ∙ t') →β (t₂ ∙ t')
+skip2lProof t' (reduce t r) = reduce (t ∙ t') (skip2l t t' r)
+
+skip2rProof : ∀ {σ Γ A} {t₁ : Term Γ σ} {t₂ : Term Γ σ} → (t' : Term Γ (σ ↝ A)) → t₁ →β t₂ → (t' ∙ t₁) →β (t' ∙ t₂)
+skip2rProof t' (reduce t r) = reduce (t' ∙ t) (skip2r t' t r)
+
+skipthProof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ) A} → t₁ →β t₂ → (Λ t₁) →β (Λ t₂)
+skipthProof (reduce t r) = reduce (Λ t) (skipth t r)
+
+
 
 {-
 data Re : Term → Set where
