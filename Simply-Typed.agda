@@ -105,7 +105,7 @@ skipthProof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ)
 skipthProof (reduce t r) = reduce (Λ t) (skipth t r)
 
 data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
-  cons : ∀ {t} → t ↠β t
+  cons : (t : Term Γ A) → t ↠β t
   succ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
 
 
