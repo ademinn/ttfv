@@ -79,22 +79,38 @@ applyReduction (skip2l _ t₂ r) = (applyReduction r) ∙ t₂
 applyReduction (skip2r t₁ _ r) = t₁ ∙ (applyReduction r)
 applyReduction (skipth t r) = Λ (applyReduction r)
 
-data _→β_ {Γ A} : Term Γ A → Term Γ A → Set where
-  reduce : (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
+data _→β_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
+  reduce : ∀ {A} (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
+--  Λβ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ →β t₂ → (Λ t₁) →β (Λ t₂)
+--  leftβ : ∀ {A B} {t₁ t₂ : Term Γ (A ↝ B)} → (t : Term Γ A) → t₁ →β t₂ → (t₁ ∙ t) →β (t₂ ∙ t)
+--  rightβ : ∀ {A B} {t₁ t₂ : Term Γ A} → (t : Term Γ (A ↝ B)) → t₁ →β t₂ → (t ∙ t₁) →β (t ∙ t₂)
 
 
-skip2lProof : ∀ {σ Γ A} {t₁ : Term Γ (σ ↝ A)} {t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ →β t₂ → (t₁ ∙ t') →β (t₂ ∙ t')
+skip2lProof : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ →β t₂ → (t₁ ∙ t') →β (t₂ ∙ t')
 skip2lProof t' (reduce t r) = reduce (t ∙ t') (skip2l t t' r)
 
-skip2rProof : ∀ {σ Γ A} {t₁ : Term Γ σ} {t₂ : Term Γ σ} → (t' : Term Γ (σ ↝ A)) → t₁ →β t₂ → (t' ∙ t₁) →β (t' ∙ t₂)
+skip2rProof : ∀ {σ Γ A} {t₁ t₂ : Term Γ σ} → (t' : Term Γ (σ ↝ A)) → t₁ →β t₂ → (t' ∙ t₁) →β (t' ∙ t₂)
 skip2rProof t' (reduce t r) = reduce (t' ∙ t) (skip2r t' t r)
 
-skipthProof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ) A} → t₁ →β t₂ → (Λ t₁) →β (Λ t₂)
+skipthProof : ∀ {σ Γ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ →β t₂ → (Λ t₁) →β (Λ t₂)
 skipthProof (reduce t r) = reduce (Λ t) (skipth t r)
+
 
 data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
   consβ : (t : Term Γ A) → t ↠β t
   succβ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
+
+skip2lProof' : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ ↠β t₂ → (t₁ ∙ t') ↠β (t₂ ∙ t')
+skip2lProof' t' (consβ t) = consβ (t ∙ t')
+skip2lProof' t' (succβ tt t) = succβ (skip2lProof' t' tt) (skip2lProof t' t)
+
+skip2rProof' : ∀ {σ Γ A} {t₁ t₂ : Term Γ σ} → (t' : Term Γ (σ ↝ A)) → t₁ ↠β t₂ → (t' ∙ t₁) ↠β (t' ∙ t₂)
+skip2rProof' t' (consβ t) = consβ (t' ∙ t)
+skip2rProof' t' (succβ tt t) = succβ (skip2rProof' t' tt) (skip2rProof t' t)
+
+skipthProof' : ∀ {σ Γ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠β t₂ → (Λ t₁) ↠β (Λ t₂)
+skipthProof' (consβ t) = consβ (Λ t)
+skipthProof' (succβ tt t) = succβ (skipthProof' tt) (skipthProof t)
 
 -- just "&&" and ","
 data _&&_ (A B : Set) : Set where
@@ -108,15 +124,30 @@ data _↠ℓ_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
   ∙ℓ : ∀ {σ A} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (t₁ ∙ p₁) ↠ℓ (t₂ ∙ p₂)
   substℓ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → ((Λ t₁) ∙ p₁) ↠ℓ (substitution p₂ t₂)
 
--- Λℓ and ∙ℓ should be functions, not constructors
+-- IMHO Λℓ and ∙ℓ should be functions, not constructors
 
 --Λproof : ∀ {σ Γ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠ℓ t₂ → (Λ t₁) ↠ℓ (Λ t₂)
 --Λproof (consℓ t) = consℓ (Λ t)
 --Λproof (substℓ ) = {!!}
 
--- 2006 - 1.4.2
+-- 2006 - page 13, lemma 1.4.2 (i)
 lemma1 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → t₁ ↠ℓ t₂
-lemma1 x = ?
+lemma1 (reduce ((Λ t₁) ∙ t₂) (this .t₁ .t₂)) = substℓ (consℓ t₁) (consℓ t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2l .t₁ .t₂ r)) = ∙ℓ (lemma1 (reduce t₁ r)) (consℓ t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2r .t₁ .t₂ r)) = ∙ℓ (consℓ t₁) (lemma1 (reduce t₂ r))
+lemma1 (reduce (Λ t) (skipth .t r)) = Λℓ (lemma1 (reduce t r))
+lemma1 (reduce (Var _) ())
+--lemma1 (Λβ t) = Λℓ (lemma1 t)
+--lemma1 (leftβ t t') = ∙ℓ (lemma1 t') (consℓ t)
+--lemma1 (rightβ t t') = ∙ℓ (consℓ t) (lemma1 t')
+
+-- 2006 - page 13, lemma 1.4.2 (ii)
+lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
+lemma2 (consℓ t) = consβ t
+lemma2 (Λℓ t) = skipthProof' (lemma2 t)
+lemma2 (∙ℓ t p) = 
+lemma2 x = {!!}
+
 
 {-
 data Re : Term → Set where
