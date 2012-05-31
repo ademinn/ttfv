@@ -100,6 +100,14 @@ data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
   consβ : (t : Term Γ A) → t ↠β t
   succβ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
 
+head : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠β t₂ → Term Γ A
+head (consβ t) = t
+head (succβ t _) = head t
+
+tail : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠β t₂ → Term Γ A
+tail (consβ t) = t
+tail (succβ _ (reduce t r)) = applyReduction r
+
 skip2lProof' : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ ↠β t₂ → (t₁ ∙ t') ↠β (t₂ ∙ t')
 skip2lProof' t' (consβ t) = consβ (t ∙ t')
 skip2lProof' t' (succβ tt t) = succβ (skip2lProof' t' tt) (skip2lProof t' t)
@@ -111,6 +119,16 @@ skip2rProof' t' (succβ tt t) = succβ (skip2rProof' t' tt) (skip2rProof t' t)
 skipthProof' : ∀ {σ Γ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠β t₂ → (Λ t₁) ↠β (Λ t₂)
 skipthProof' (consβ t) = consβ (Λ t)
 skipthProof' (succβ tt t) = succβ (skipthProof' tt) (skipthProof t)
+
+join : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠β t₂ → p₁ ↠β p₂ → (t₁ ∙ p₁) ↠β (t₂ ∙ p₂)
+join (consβ t) (consβ p) = consβ (t ∙ p) --{!!}
+join (consβ t) p = skip2rProof' t p
+join t (consβ p) = skip2lProof' p t
+join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join tt pp) (skip2lProof p t')) (skip2rProof t'' p')
+  where
+    t' = (reduce t rt)
+    p' = (reduce p rp)
+    t'' = applyReduction rt
 
 -- just "&&" and ","
 data _&&_ (A B : Set) : Set where
@@ -145,8 +163,11 @@ lemma1 (reduce (Var _) ())
 lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
 lemma2 (consℓ t) = consβ t
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
---lemma2 (∙ℓ t p) = 
+lemma2 (∙ℓ t p) = join (lemma2 t) (lemma2 p)
 lemma2 x = {!!}
+
+lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
+lemma3 x y = {!!}
 
 
 {-
