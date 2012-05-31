@@ -164,10 +164,16 @@ lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β 
 lemma2 (consℓ t) = consβ t
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
 lemma2 (∙ℓ t p) = join (lemma2 t) (lemma2 p)
-lemma2 x = {!!}
+lemma2 (substℓ t p) = {!!}
 
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
-lemma3 x y = {!!}
+lemma3 (consℓ t) (consℓ p) = consℓ (substitution p t)
+lemma3 (consℓ t) (Λℓ p) = {!!}
+lemma3 (consℓ t) (∙ℓ pt pp) = {!!}
+lemma3 (consℓ t) (substℓ pt pp) = {!!}
+lemma3 (Λℓ t) p = {!!}
+lemma3 (∙ℓ tt tp) p = {!!}
+lemma3 (substℓ tt tp) p = {!!}
 
 
 {-
