@@ -145,7 +145,7 @@ lemma1 (reduce (Var _) ())
 lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
 lemma2 (consℓ t) = consβ t
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
-lemma2 (∙ℓ t p) = 
+--lemma2 (∙ℓ t p) = 
 lemma2 x = {!!}
 
 
