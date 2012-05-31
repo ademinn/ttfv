@@ -7,7 +7,7 @@ open import ListProofs
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
 
--- ↝ \r~
+-- ↝ is \r~
 infixr 5 _↝_
 data Type : Set where
   con : String → Type 
@@ -67,20 +67,20 @@ data ΛRedex {Γ s1 s2} : Term Γ (s1 ↝ s2) → Set where
   skipth : ∀ {t : Term (s1 ∷ Γ) s2} → ΛRedex (Λ t)
 -}
 
-data Redex {Γ} : (A : Type) → Term Γ A → Set where
-  this    : ∀ {σ A} → (t₁ : Term (σ ∷ Γ) A) → (t₂ : Term Γ σ) → Redex A ((Λ t₁) ∙ t₂)
-  skip2l  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex (σ ↝ A) t₁ → Redex A (t₁ ∙ t₂)
-  skip2r  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex σ t₂ → Redex A (t₁ ∙ t₂)
-  skipth : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex A t → Redex (σ ↝ A) (Λ t)
+data Redex {Γ} : {A : Type} → Term Γ A → Set where
+  this    : ∀ {σ A} → (t₁ : Term (σ ∷ Γ) A) → (t₂ : Term Γ σ) → Redex ((Λ t₁) ∙ t₂)
+  skip2l  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₁ → Redex (t₁ ∙ t₂)
+  skip2r  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₂ → Redex (t₁ ∙ t₂)
+  skipth : ∀ {σ A} → (t : Term (σ ∷ Γ) A) → Redex t → Redex (Λ t)
 
-applyReduction : {A : Type} {Γ : TList} {t : Term Γ A} → Redex A t → Term Γ A
+applyReduction : {A : Type} {Γ : TList} {t : Term Γ A} → Redex t → Term Γ A
 applyReduction (this t₁ t₂)  = substitution t₂ t₁
 applyReduction (skip2l _ t₂ r) = (applyReduction r) ∙ t₂
 applyReduction (skip2r t₁ _ r) = t₁ ∙ (applyReduction r)
 applyReduction (skipth t r) = Λ (applyReduction r)
 
 data _→β_ {Γ A} : Term Γ A → Term Γ A → Set where
-  reduce : (t : Term Γ A) → (r : Redex A t) → t →β (applyReduction r)
+  reduce : (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
 
 
 skip2lProof : ∀ {σ Γ A} {t₁ : Term Γ (σ ↝ A)} {t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ →β t₂ → (t₁ ∙ t') →β (t₂ ∙ t')
@@ -93,8 +93,30 @@ skipthProof : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term (σ ∷ Γ)
 skipthProof (reduce t r) = reduce (Λ t) (skipth t r)
 
 data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
-  cons : (t : Term Γ A) → t ↠β t
-  succ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
+  consβ : (t : Term Γ A) → t ↠β t
+  succβ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
+
+-- just "&&" and ","
+data _&&_ (A B : Set) : Set where
+  _,_ : A → B → A && B
+
+
+-- ℓ is \ell
+data _↠ℓ_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
+  consℓ : ∀{A} (t : Term Γ A) → t ↠ℓ t
+  Λℓ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠ℓ t₂ → (Λ t₁) ↠ℓ (Λ t₂)
+  ∙ℓ : ∀ {σ A} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (t₁ ∙ p₁) ↠ℓ (t₂ ∙ p₂)
+  substℓ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → ((Λ t₁) ∙ p₁) ↠ℓ (substitution p₂ t₂)
+
+-- Λℓ and ∙ℓ should be functions, not constructors
+
+--Λproof : ∀ {σ Γ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠ℓ t₂ → (Λ t₁) ↠ℓ (Λ t₂)
+--Λproof (consℓ t) = consℓ (Λ t)
+--Λproof (substℓ ) = {!!}
+
+-- 2006 - 1.4.2
+lemma1 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → t₁ ↠ℓ t₂
+lemma1 x = ?
 
 {-
 data Re : Term → Set where
