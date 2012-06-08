@@ -131,8 +131,8 @@ join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join 
     t'' = applyReduction rt
 
 redexLast : ∀ {σ Γ A} (t₁ : Term (σ ∷ Γ) A) (t₂ : Term Γ σ) (t : Term Γ A) → t ↠β ((Λ t₁) ∙ t₂) → t ↠β (applyReduction (this t₁ t₂))
-redexLast t₁ t₂ ((Λ .t₁) ∙ .t₂) (consβ ((Λ .t₁) ∙ .t₂)) = ? --{!!}
-redexLast t₁ t₂ t₃ s = ?
+--redexLast t₁ t₂ ((Λ .t₁) ∙ .t₂) (consβ ((Λ .t₁) ∙ .t₂)) = ? --{!!}
+redexLast t₁ t₂ t₃ s = {!!}
 --redexLast {_}{_}{_} {t₁} {t₂} {(Λ .t₁) ∙ .t₂} (consβ ((Λ .t₁) ∙ .t₂)) = ?
 --redexLast (consβ ())
 --redexLast (succβ tt t)  = ?
