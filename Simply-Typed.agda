@@ -130,6 +130,17 @@ join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join 
     p' = (reduce p rp)
     t'' = applyReduction rt
 
+redexLast : ∀ {σ Γ A} (t₁ : Term (σ ∷ Γ) A) (t₂ : Term Γ σ) (t : Term Γ A) → t ↠β ((Λ t₁) ∙ t₂) → t ↠β (applyReduction (this t₁ t₂))
+redexLast t₁ t₂ ((Λ .t₁) ∙ .t₂) (consβ ((Λ .t₁) ∙ .t₂)) = ? --{!!}
+redexLast t₁ t₂ t₃ s = ?
+--redexLast {_}{_}{_} {t₁} {t₂} {(Λ .t₁) ∙ .t₂} (consβ ((Λ .t₁) ∙ .t₂)) = ?
+--redexLast (consβ ())
+--redexLast (succβ tt t)  = ?
+--redexLast (consβ ())
+--redexLast t with tail t --= {!!}
+--... | (Λ t₁) ∙ t₂ = ?
+--... | ()
+
 -- just "&&" and ","
 data _&&_ (A B : Set) : Set where
   _,_ : A → B → A && B
@@ -165,6 +176,16 @@ lemma2 (consℓ t) = consβ t
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
 lemma2 (∙ℓ t p) = join (lemma2 t) (lemma2 p)
 lemma2 (substℓ t p) = {!!}
+  where
+    t₁ = lemma2 t
+    p₁ = lemma2 p
+--    ttail = tail t₁
+--    ptail = tail p₁
+--    r = this ttail ptail
+--    b = reduce ((Λ ttail) ∙ ptail) r
+    init = join (skipthProof' t₁) p₁
+--... | succβ tt ttr = ?
+--... | { }
 
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
 lemma3 (consℓ t) (consℓ p) = consℓ (substitution p t)
