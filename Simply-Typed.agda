@@ -183,5 +183,8 @@ _* : ∀ {Γ A} → Term Γ A → Term Γ A
 lemma4 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₂ ↠ℓ (t₁ *)
 lemma4 (consℓ t) = consℓ t
 lemma4 (Λℓ t) = Λℓ (lemma4 t)
-lemma4 (∙ℓ t p) = {!!}
+lemma4 (∙ℓ (Λℓ t) p) = substℓ (lemma4 t) (lemma4 p)
+lemma4 (∙ℓ (consℓ a) p) = ∙ℓ (lemma4 (consℓ a)) (lemma4 p)
+lemma4 (∙ℓ (∙ℓ y y') p) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 p)
+lemma4 (∙ℓ (substℓ y y') p) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 p)
 lemma4 (substℓ t p) = {!!}
