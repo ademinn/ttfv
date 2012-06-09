@@ -178,3 +178,19 @@ lemma3 (consℓ a) (substℓ y y') = {!!}
 lemma3 (Λℓ y) p = {!!}
 lemma3 (∙ℓ y y') p = {!!}
 lemma3 (substℓ y y') p = {!!}
+
+_* : ∀ {Γ A} → Term Γ A → Term Γ A
+(Var a)* = Var a
+(Λ y)* = Λ (y *)
+((Λ y) ∙ y')* = substitution (y' *) (y *)
+(y ∙ y') * = (y *) ∙ (y' *)
+
+-- 2006 - page 14, lemma 1.4.4
+lemma4 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₂ ↠ℓ (t₁ *)
+lemma4 (consℓ t) = consℓ t
+lemma4 (Λℓ t) = Λℓ (lemma4 t)
+lemma4 (∙ℓ (Λℓ t) p) = substℓ (lemma4 t) (lemma4 p)
+lemma4 (∙ℓ (consℓ a) p) = ∙ℓ (lemma4 (consℓ a)) (lemma4 p)
+lemma4 (∙ℓ (∙ℓ y y') p) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 p)
+lemma4 (∙ℓ (substℓ y y') p) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 p)
+lemma4 (substℓ t p) = {!!}
