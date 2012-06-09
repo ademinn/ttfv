@@ -56,17 +56,6 @@ substitution = term-substitution [] _
 data isRedex {Γ P} : Term Γ P → Set where
   con : ∀ {σ} (t1 : Term (σ ∷ Γ) P) → (t2 : Term Γ σ) → isRedex ((Λ t1) ∙ t2)
 
-{-
-data TRedex {Γ A} : Term Γ A → Set where
-  this   : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex ((Λ t₁) ∙ t₂)
-  skip2l : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex t₁ → TRedex ((Λ t₁) ∙ t₂)
-  skip2r : ∀ {σ} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} → TRedex t₂ → TRedex ((Λ t₁) ∙ t₂)
-  skipth : {s1 s2 : Type} {t : Term (s1 ∷ Γ) s2} {A : s1 ↝ s2} →  TRedex (Λ t)
-
-data ΛRedex {Γ s1 s2} : Term Γ (s1 ↝ s2) → Set where
-  skipth : ∀ {t : Term (s1 ∷ Γ) s2} → ΛRedex (Λ t)
--}
-
 data Redex {Γ} : {A : Type} → Term Γ A → Set where
   this    : ∀ {σ A} → (t₁ : Term (σ ∷ Γ) A) → (t₂ : Term Γ σ) → Redex ((Λ t₁) ∙ t₂)
   skip2l  : ∀ {σ A} → (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₁ → Redex (t₁ ∙ t₂)
@@ -141,7 +130,7 @@ data _&&_ (A B : Set) : Set where
 
 -- ℓ is \ell
 data _↠ℓ_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
-  consℓ : ∀{A} (t : Term Γ A) → t ↠ℓ t
+  consℓ : ∀{A} (a : A ∈ Γ) → (Var a) ↠ℓ (Var a)
   Λℓ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠ℓ t₂ → (Λ t₁) ↠ℓ (Λ t₂)
   ∙ℓ : ∀ {σ A} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (t₁ ∙ p₁) ↠ℓ (t₂ ∙ p₂)
   substℓ : ∀ {σ A} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → ((Λ t₁) ∙ p₁) ↠ℓ (substitution p₂ t₂)
@@ -154,9 +143,9 @@ data _↠ℓ_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
 
 -- 2006 - page 13, lemma 1.4.2 (i)
 lemma1 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → t₁ ↠ℓ t₂
-lemma1 (reduce ((Λ t₁) ∙ t₂) (this .t₁ .t₂)) = substℓ (consℓ t₁) (consℓ t₂)
-lemma1 (reduce (t₁ ∙ t₂) (skip2l .t₁ .t₂ r)) = ∙ℓ (lemma1 (reduce t₁ r)) (consℓ t₂)
-lemma1 (reduce (t₁ ∙ t₂) (skip2r .t₁ .t₂ r)) = ∙ℓ (consℓ t₁) (lemma1 (reduce t₂ r))
+lemma1 (reduce ((Λ t₁) ∙ t₂) (this .t₁ .t₂)) = {!!} --substℓ (consβ t₁) (consβ t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2l .t₁ .t₂ r)) = {!!} -- ∙ℓ (lemma1 (reduce t₁ r)) (consℓ t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2r .t₁ .t₂ r)) = {!!} -- ∙ℓ (consℓ t₁) (lemma1 (reduce t₂ r))
 lemma1 (reduce (Λ t) (skipth .t r)) = Λℓ (lemma1 (reduce t r))
 lemma1 (reduce (Var _) ())
 --lemma1 (Λβ t) = Λℓ (lemma1 t)
@@ -165,7 +154,7 @@ lemma1 (reduce (Var _) ())
 
 -- 2006 - page 13, lemma 1.4.2 (ii)
 lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
-lemma2 (consℓ t) = consβ t
+lemma2 (consℓ t) = {!!} -- consβ t
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
 lemma2 (∙ℓ t p) = join (lemma2 t) (lemma2 p)
 lemma2 (substℓ t p) = redexLast init
@@ -174,24 +163,6 @@ lemma2 (substℓ t p) = redexLast init
     p₁ = lemma2 p
     init = join (skipthProof' t₁) p₁
 
---lemma3i : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} → t₁ ↠ℓ t₂ → (p : Term Γ σ) → (substitution p t₁) ↠ℓ (substitution p t₂)
---lemma3i = {!!}
-
---lemma3ii : ∀ {σ A Γ} {p₁ p₂ : Term Γ σ} → (t : Term (σ ∷ Γ) A) → p₁ ↠ℓ p₂ → (substitution p₁ t) ↠ℓ (substitution p₂ t)
---lemma3ii = {!!}
-
 -- 2006 - page 13, lemma 1.4.2 (iii)
--- prove using lemma3i and lemma3ii
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
 lemma3 t p = {!!}
-
-
-{-
-data Re : Term → Set where
-  skip2l : ∀ M N → Re M → Re (M ∙ N)reduce
-  skip2r : ∀ M N → Re N → Re (M ∙ N)
-  skipth : ∀ x M → Re M → Re (Λ x ⟶ N)
-  this : ∀ x M N → Re ((Λ x ⟶ M) ∙ N)
-
-applyreduction (M : Preterm) → Re M → PreTerm
--}
