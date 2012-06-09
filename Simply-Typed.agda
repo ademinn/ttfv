@@ -172,10 +172,13 @@ lemma2 (substℓ t p) = redexLast init
 -- 2006 - page 13, lemma 1.4.2 (iii)
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
 lemma3 (consℓ a) (consℓ a') = consℓterm (substitution (Var a') (Var a))
-lemma3 (consℓ a) (Λℓ (consℓ a')) = consℓterm (substitution (Λ (Var a')) (Var a))
-lemma3 (consℓ a) (Λℓ (Λℓ y)) = {!!}
-lemma3 (consℓ a) (Λℓ (∙ℓ y y')) = {!!}
-lemma3 (consℓ a) (Λℓ (substℓ y y')) = {!!} -- consℓterm (substitution (Λ {!!}) {!!})
+lemma3 (consℓ Z) (Λℓ y) = Λℓ y
+lemma3 (consℓ (S n)) (Λℓ y) = consℓ n
+--lemma3 (consℓ a) (Λℓ (consℓ a')) = consℓterm (substitution (Λ (Var a')) (Var a))
+--lemma3 (consℓ Z) (Λℓ (Λℓ y)) = Λℓ (Λℓ y)
+--lemma3 (consℓ (S n)) (Λℓ (Λℓ y)) = {!!}
+--lemma3 (consℓ a) (Λℓ (∙ℓ y y')) = {!!}
+--lemma3 (consℓ a) (Λℓ (substℓ y y')) = {!!} -- consℓterm (substitution (Λ {!!}) {!!})
 lemma3 (consℓ a) (∙ℓ y y') = {!!}
 lemma3 (consℓ a) (substℓ y y') = {!!}
 lemma3 (Λℓ y) p = {!!}
