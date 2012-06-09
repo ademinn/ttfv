@@ -171,4 +171,10 @@ lemma2 (substℓ t p) = redexLast init
 
 -- 2006 - page 13, lemma 1.4.2 (iii)
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
-lemma3 t p = {!!}
+lemma3 (consℓ a) (consℓ a') = consℓterm (substitution (Var a') (Var a))
+lemma3 (consℓ a) (Λℓ y) = {!!}
+lemma3 (consℓ a) (∙ℓ y y') = {!!}
+lemma3 (consℓ a) (substℓ y y') = {!!}
+lemma3 (Λℓ y) p = {!!}
+lemma3 (∙ℓ y y') p = {!!}
+lemma3 (substℓ y y') p = {!!}
