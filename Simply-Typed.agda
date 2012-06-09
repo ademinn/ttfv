@@ -141,11 +141,17 @@ data _↠ℓ_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
 --Λproof (consℓ t) = consℓ (Λ t)
 --Λproof (substℓ ) = {!!}
 
+consℓterm : ∀ {Γ A} → (t : Term Γ A) → t ↠ℓ t
+consℓterm (Var y) = consℓ y
+consℓterm (Λ y) = Λℓ (consℓterm y)
+consℓterm (y ∙ y') = ∙ℓ (consℓterm y) (consℓterm y')
+
+
 -- 2006 - page 13, lemma 1.4.2 (i)
 lemma1 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → t₁ ↠ℓ t₂
-lemma1 (reduce ((Λ t₁) ∙ t₂) (this .t₁ .t₂)) = {!!} --substℓ (consβ t₁) (consβ t₂)
-lemma1 (reduce (t₁ ∙ t₂) (skip2l .t₁ .t₂ r)) = {!!} -- ∙ℓ (lemma1 (reduce t₁ r)) (consℓ t₂)
-lemma1 (reduce (t₁ ∙ t₂) (skip2r .t₁ .t₂ r)) = {!!} -- ∙ℓ (consℓ t₁) (lemma1 (reduce t₂ r))
+lemma1 (reduce ((Λ t₁) ∙ t₂) (this .t₁ .t₂)) = substℓ (consℓterm t₁) (consℓterm t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2l .t₁ .t₂ r)) = ∙ℓ (lemma1 (reduce t₁ r)) (consℓterm t₂)
+lemma1 (reduce (t₁ ∙ t₂) (skip2r .t₁ .t₂ r)) = ∙ℓ (consℓterm t₁) (lemma1 (reduce t₂ r))
 lemma1 (reduce (Λ t) (skipth .t r)) = Λℓ (lemma1 (reduce t r))
 lemma1 (reduce (Var _) ())
 --lemma1 (Λβ t) = Λℓ (lemma1 t)
@@ -154,7 +160,7 @@ lemma1 (reduce (Var _) ())
 
 -- 2006 - page 13, lemma 1.4.2 (ii)
 lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
-lemma2 (consℓ t) = {!!} -- consβ t
+lemma2 (consℓ t) = consβ (Var t)
 lemma2 (Λℓ t) = skipthProof' (lemma2 t)
 lemma2 (∙ℓ t p) = join (lemma2 t) (lemma2 p)
 lemma2 (substℓ t p) = redexLast init
