@@ -18,12 +18,17 @@ _-_ : ∀ {a} {A : Set a} {x : A} → (l : List A) → (x ∈ l) → List A
 (x ∷ xs) - (S n) = x ∷ (xs - n)
 [] - ()
 
+--_+_ : ∀ {a} {A : Set a} → (l : List A) → (x : A) → List A
+
 ⊆⊹ : ∀ {a} {A : Set a} → (x : List A) → (y : List A) → (x ⊆ (y ⊹ x))
 ⊆⊹ x [] = ⊆refl x
 ⊆⊹ x (y ∷ ys) = ⊆add y (⊆⊹ x ys)
 
-∈⊹ : ∀ {a} {A : Set a} {l' : List A} {x : A} → (l : List A) → (x ∈ l') → (x ∈ (l ⊹ l'))
-∈⊹ {_} {_} {l'} l x = (⊆⊹ l' l) x
+∈⊹ : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (l' ⊆ l) → (x ∈ l') → (x ∈ l)
+∈⊹ θ a = θ a
+
+∈add : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (l' ⊆ (x ∷ l))
+∈add = {!!}
 
 TList = List Type
 
@@ -33,10 +38,10 @@ data Term : TList → Type → Set where
   Λ   : ∀ {A B Γ} → (a : A ∈ Γ) → Term Γ B → Term (Γ - a) (A ↝ B)
   _∙_ : ∀ {A B Γ} → Term Γ (A ↝ B) → Term Γ A → Term Γ B
 
-weaking : ∀ {Γ Γ' A} → Term Γ' A → Term (Γ ⊹ Γ') A
-weaking {Γ} {Γ'} (Var y) = Var ((⊆⊹ Γ' Γ) y)
-weaking {Γ1} (Λ {_} {_} {_} a y) = {!!} --Λ (∈⊹ Γ1 a) (weaking y)
-weaking {Γ} {Γ'} (y ∙ y') = (weaking {Γ} {Γ'} y) ∙ (weaking {Γ} {Γ'} y')
+weaking : ∀ {Γ Γ' A} → (Γ' ⊆ Γ) → Term Γ' A → Term Γ A
+weaking θ (Var y) = Var (θ y)
+weaking θ (Λ a y) = {!!} --Λ (∈⊹ Γ1 a) (weaking y)
+weaking θ (y ∙ y') = (weaking θ y) ∙ (weaking θ y')
 
 var-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
 var-substitution Z tf Z = {!tf!}
