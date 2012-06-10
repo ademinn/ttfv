@@ -172,13 +172,22 @@ lemma2 (substℓ t p) = redexLast init
 ℓweaking : ∀ {σ A Γ} {t₁ t₂ : Term σ Γ} → t₁ ↠ℓ t₂ → (weaking {A = A} t₁) ↠ℓ (weaking {A = A} t₂)
 ℓweaking = {!!}
 
+ℓfirst : ∀ {σ Γ} {t₁ t₂ : Term Γ σ} → t₁ ↠ℓ t₂ → Term Γ σ
+ℓfirst (consℓ a) = Var a
+ℓfirst (Λℓ y) = Λ (ℓfirst y)
+ℓfirst (∙ℓ y y') = ℓfirst y ∙ ℓfirst y'
+ℓfirst (substℓ y y') = Λ (ℓfirst y) ∙ ℓfirst y'
+
 -- 2006 - page 13, lemma 1.4.2 (iii)
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
 lemma3 (consℓ Z) p = p
 lemma3 (consℓ (S n)) p = consℓ n
-lemma3 (Λℓ y) p = Λℓ (consℓterm (term-substitution {!!} {!!} {!!} {!!}))
+lemma3 {σ = σ1} {Γ = Γ} (Λℓ {A} {B} y) p = Λℓ (consℓterm (term-substitution [ A ] Γ (ℓfirst {σ1} {Γ} p) (ℓfirst {!!})))
 lemma3 (∙ℓ y y') p = {!!}
 lemma3 (substℓ y y') p = {!!}
+
+tlemma3 : ∀ {σ A Γ Γ'} {t₁ t₂ : Term (Γ ⊹ [ σ ] ⊹ Γ') A} {p₁ p₂ : Term Γ' σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
+tlemma3 = ?
 
 _* : ∀ {Γ A} → Term Γ A → Term Γ A
 (Var a)* = Var a
