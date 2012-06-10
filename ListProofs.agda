@@ -17,12 +17,18 @@ data _∈_ {a} {A : Set a} : A → List A → Set a where
 _⊆_ : ∀ {a} {A : Set a} → List A → List A → Set a
 xs ⊆ ys = ∀ {x} → x ∈ xs → x ∈ ys
 
+⊆refl : ∀ {a} {A : Set a} (xs : List A) → (xs ⊆ xs)
+⊆refl xs = λ x → x
+
 ⊆cong : ∀ {a} {A : Set a} {x y : A} {xs ys : List A} → x ≡ y → (xs ⊆ ys) → ((x ∷ xs) ⊆ (y ∷ ys))
 ⊆cong (Refl {x}) f Z = Z
 ⊆cong refl f (S n) = S (f n)
 
-xs⊆x∷xs : ∀ {a} {A : Set a} {y : A} {xs : List A} → (xs ⊆ (y ∷ xs))
-xs⊆x∷xs = S
+⊆add : ∀ {a} {A : Set a} {xs ys : List A} (y : A) → (xs ⊆ ys) → (xs ⊆ (y ∷ ys))
+⊆add y s = λ z → S (s z)
+
+xs⊆x∷xs : ∀ {a} {A : Set a} (y : A) (xs : List A) → (xs ⊆ (y ∷ xs))
+xs⊆x∷xs y xs = ⊆add y (⊆refl xs)
 
 x∷y∷s⊆y∷x∷s : ∀ {a} {A : Set a} {x y : A} {s : List A} → ((x ∷ y ∷ s) ⊆ (y ∷ x ∷ s))
 x∷y∷s⊆y∷x∷s Z = S Z
