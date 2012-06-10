@@ -42,7 +42,16 @@ data Term (Γ : TList) : Type → Set where
 
 data _≡t_ {Γ Γ' : TList} : {A : Type} → Term Γ A → Term Γ' A → Set where
   _≡v_ : ∀ {A} (a : A ∈ Γ) → (a' : A ∈ Γ') → (Var a) ≡t (Var a')
-  _≡Λ_ : ∀ {A B} {t₁ : Term (A ∷ Γ) B} {t₂ : Term (A ∷ Γ') B} → t₁ ≡t t₂ → (Λ t₁) ≡t (Λ t₂)
+  ≡Λ_ : ∀ {A B} {t₁ : Term (A ∷ Γ) B} {t₂ : Term (A ∷ Γ') B}
+    → t₁ ≡t t₂ → (Λ t₁) ≡t (Λ t₂)
+  _≡∙_ : ∀ {A B} {t₁ : Term Γ (A ↝ B)} {t₂ : Term Γ' (A ↝ B)} {p₁ : Term Γ A} {p₂ : Term Γ' A}
+    → t₁ ≡t t₂ → p₁ ≡t p₂ → (t₁ ∙ p₁) ≡t (t₂ ∙ p₂)
+
+
+≡term : ∀ {Γ A} → (t : Term Γ A) → t ≡t t
+≡term (Var y) = y ≡v y
+≡term (Λ y) = ≡Λ (≡term y)
+≡term (y ∙ y') = (≡term y) ≡∙ (≡term y')
 
 wk : ∀ {Γ Δ A} → (Γ ⊆ Δ) → Term Γ A → Term Δ A
 wk θ (Var y) = Var (θ y)
