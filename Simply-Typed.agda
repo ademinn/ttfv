@@ -1,5 +1,6 @@
 module Simply-Typed where
 
+open import Data.Bool
 open import Data.List
 open import Data.String
 open import Level
@@ -13,7 +14,23 @@ data Type : Set where
   con : String → Type 
   _↝_ : Type → Type → Type
 
+_=t_ : Type → Type → Bool
+con y =t con y' = y == y'
+con y =t (y' ↝ y0) = false
+(y ↝ y') =t con y0 = false
+(y ↝ y') =t (y0 ↝ y1) = y =t y0 ∧ y' =t y1
+
 TList = List Type
+
+_=l_ : (xs : TList) → (ys : TList) → Bool
+[] =l [] = true
+[] =l (x ∷ xs) = false
+(x ∷ xs) =l [] = false
+(x ∷ xs) =l (x' ∷ xs') = x =t x' ∧ xs =l xs'
+
+ys⊆xs∷ys : (xs : TList) → (ys : TList) → (ys ⊆ (xs ⊹ ys))
+ys⊆xs∷ys [] ys = ⊆refl ys
+ys⊆xs∷ys (x ∷ xs) ys = ⊆add x (ys⊆xs∷ys xs ys)
 
 -- ∙ is \.
 -- ∷ is \::
@@ -33,7 +50,7 @@ wk θ (y₁ ∙ y₂) = wk θ y₁ ∙ wk θ y₂
 wk θ (Λ y) = Λ (wk (⊆cong Refl θ) y)
 
 weaking : ∀ {Γ A B} → Term Γ B → Term (A ∷ Γ) B
-weaking = wk xs⊆x∷xs
+weaking {Γ} {A} = wk (xs⊆x∷xs A Γ)
 
 exchange : ∀ {Γ A B C} → Term (A ∷ B ∷ Γ) C → Term (B ∷ A ∷ Γ) C
 exchange = wk x∷y∷s⊆y∷x∷s
@@ -187,7 +204,6 @@ lemma2 (substℓ t p) = redexLast init
 ℓweaking σ (∙ℓ y y') = {!!}
 ℓweaking σ (substℓ y y') = {!!}
 
-
 ℓfirst : ∀ {σ Γ} {t₁ t₂ : Term Γ σ} → t₁ ↠ℓ t₂ → Term Γ σ
 ℓfirst (consℓ a) = Var a
 ℓfirst (Λℓ y) = Λ (ℓfirst y)
@@ -204,16 +220,12 @@ lemma3 {σ = σ1} {Γ = Γ} (Λℓ {A} {B} y) p = Λℓ (consℓterm (term-subst
 lemma3 (∙ℓ y y') p = {!!}
 lemma3 (substℓ y y') p = {!!}
 
---ℓweaking' : ∀ {}
---  → (σ : Type) → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
---  → (term-substitution (σ ∷ Γ) Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
-
 tlemma3 : ∀ {σ A Γ Γ'} {t₁ t₂ : Term (Γ ⊹ [ σ ] ⊹ Γ') A} {p₁ p₂ : Term Γ' σ}
   → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
 tlemma3 {Γ = []} (consℓ Z) pp = pp
 tlemma3 {Γ = σ' ∷ Γ'} (consℓ Z) pp = consℓ Z
 tlemma3 {Γ = []} (consℓ (S n)) pp = consℓ n
-tlemma3 {Γ = σ' ∷ Γ1} (consℓ (S n)) pp = {!ℓweaking σ' (tlemma3 {Γ = Γ1} (consℓ n) pp)!} -- weaking {A = σ'} (tlemma3 {Γ = Γ'} (consℓ n) pp)
+tlemma3 {Γ = σ' ∷ Γ1} (consℓ (S n)) pp = {!ℓweaking σ' (tlemma3 {Γ = Γ1} (consℓ n) pp)!}
 tlemma3 (Λℓ y) pp = {!!}
 tlemma3 (∙ℓ y y') pp = {!!}
 tlemma3 (substℓ y y') pp = {!!}
