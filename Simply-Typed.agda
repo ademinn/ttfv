@@ -23,6 +23,10 @@ data Term (Γ : TList) : Type → Set where
   Λ   : ∀ {A B} → Term (A ∷ Γ) B → Term Γ (A ↝ B)
   _∙_ : ∀ {A B} → Term Γ (A ↝ B) → Term Γ A → Term Γ B
 
+data _≡t_ {Γ Γ' : TList} : {A : Type} → Term Γ A → Term Γ' A → Set where
+  _≡v_ : ∀ {A} (a : A ∈ Γ) → (a' : A ∈ Γ') → (Var a) ≡t (Var a')
+  _≡Λ_ : ∀ {A B} {t₁ : Term (A ∷ Γ) B} {t₂ : Term (A ∷ Γ') B} → t₁ ≡t t₂ → (Λ t₁) ≡t (Λ t₂)
+
 wk : ∀ {Γ Δ A} → (Γ ⊆ Δ) → Term Γ A → Term Δ A
 wk θ (Var y) = Var (θ y)
 wk θ (y₁ ∙ y₂) = wk θ y₁ ∙ wk θ y₂
@@ -169,14 +173,28 @@ lemma2 (substℓ t p) = redexLast init
     p₁ = lemma2 p
     init = join (skipthProof' t₁) p₁
 
-ℓweaking : ∀ {σ A Γ} {t₁ t₂ : Term σ Γ} → t₁ ↠ℓ t₂ → (weaking {A = A} t₁) ↠ℓ (weaking {A = A} t₂)
-ℓweaking = {!!}
+ℓexchange : ∀ {A B C Γ} {t₁ t₂ : Term (A ∷ B ∷ Γ) C}
+  → t₁ ↠ℓ t₂ → (exchange t₁) ↠ℓ (exchange t₂)
+ℓexchange (consℓ a) = consℓterm (exchange (Var a))
+ℓexchange (Λℓ y) = {!!}
+ℓexchange (∙ℓ y y') = {!!}
+ℓexchange (substℓ y y') = {!!}
+
+ℓweaking : ∀ {A' Γ} {t₁ t₂ : Term Γ A'}
+  → (σ : Type) → t₁ ↠ℓ t₂ → (weaking {A = σ} t₁) ↠ℓ (weaking {A = σ} t₂)
+ℓweaking σ (consℓ a) = consℓ (S a)
+ℓweaking σ (Λℓ y) = {!!}
+ℓweaking σ (∙ℓ y y') = {!!}
+ℓweaking σ (substℓ y y') = {!!}
+
 
 ℓfirst : ∀ {σ Γ} {t₁ t₂ : Term Γ σ} → t₁ ↠ℓ t₂ → Term Γ σ
 ℓfirst (consℓ a) = Var a
 ℓfirst (Λℓ y) = Λ (ℓfirst y)
 ℓfirst (∙ℓ y y') = ℓfirst y ∙ ℓfirst y'
 ℓfirst (substℓ y y') = Λ (ℓfirst y) ∙ ℓfirst y'
+
+--pickup : ∀ {} (Term )
 
 -- 2006 - page 13, lemma 1.4.2 (iii)
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
@@ -186,8 +204,19 @@ lemma3 {σ = σ1} {Γ = Γ} (Λℓ {A} {B} y) p = Λℓ (consℓterm (term-subst
 lemma3 (∙ℓ y y') p = {!!}
 lemma3 (substℓ y y') p = {!!}
 
-tlemma3 : ∀ {σ A Γ Γ'} {t₁ t₂ : Term (Γ ⊹ [ σ ] ⊹ Γ') A} {p₁ p₂ : Term Γ' σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
-tlemma3 = ?
+--ℓweaking' : ∀ {}
+--  → (σ : Type) → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
+--  → (term-substitution (σ ∷ Γ) Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
+
+tlemma3 : ∀ {σ A Γ Γ'} {t₁ t₂ : Term (Γ ⊹ [ σ ] ⊹ Γ') A} {p₁ p₂ : Term Γ' σ}
+  → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (term-substitution Γ Γ' p₁ t₁) ↠ℓ (term-substitution Γ Γ' p₂ t₂)
+tlemma3 {Γ = []} (consℓ Z) pp = pp
+tlemma3 {Γ = σ' ∷ Γ'} (consℓ Z) pp = consℓ Z
+tlemma3 {Γ = []} (consℓ (S n)) pp = consℓ n
+tlemma3 {Γ = σ' ∷ Γ1} (consℓ (S n)) pp = {!ℓweaking σ' (tlemma3 {Γ = Γ1} (consℓ n) pp)!} -- weaking {A = σ'} (tlemma3 {Γ = Γ'} (consℓ n) pp)
+tlemma3 (Λℓ y) pp = {!!}
+tlemma3 (∙ℓ y y') pp = {!!}
+tlemma3 (substℓ y y') pp = {!!}
 
 _* : ∀ {Γ A} → Term Γ A → Term Γ A
 (Var a)* = Var a
