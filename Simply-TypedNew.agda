@@ -18,6 +18,17 @@ _-_ : ∀ {a} {A : Set a} {x : A} → (l : List A) → (x ∈ l) → List A
 (x ∷ xs) - (S n) = x ∷ (xs - n)
 [] - ()
 
+_≡e_ : ∀ {a} {A : Set a} {x y : A} {l : List A} → (x ∈ l) → (y ∈ l) → Bool
+Z ≡e Z = true
+Z ≡e S n = false
+S n ≡e Z = false
+S n ≡e S n' = n ≡e n'
+
+--data NEq {a} {A : Set a} : {l : List A} {x y : A} → (x ∈ l) → (y ∈ l) → Set where
+--  left : {xs : List A} {x : A} → (t : x ∈ xs) → NEq {l = xs} (S t) (Z)
+
+
+ 
 --_+_ : ∀ {a} {A : Set a} → (l : List A) → (x : A) → List A
 
 ⊆⊹ : ∀ {a} {A : Set a} → (x : List A) → (y : List A) → (x ⊆ (y ⊹ x))
@@ -27,8 +38,20 @@ _-_ : ∀ {a} {A : Set a} {x : A} → (l : List A) → (x ∈ l) → List A
 ∈⊹ : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (l' ⊆ l) → (x ∈ l') → (x ∈ l)
 ∈⊹ θ a = θ a
 
+foo : ∀ {a} {A : Set a} {l : List A} {x₁ x₂ : A}
+  → (t₁ : x₁ ∈ l) → (t₂ : x₂ ∈ l) → ((t₁ ≡e t₂) ≡ false) → (x₂ ∈ (l - t₁))
+foo Z Z x = {!!}
+foo Z (S n) x = {!!}
+foo (S n) ts x = {!!}
+
+∈add' : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (x ∈ (x ∷ l)) → (l' ⊆ (x ∷ l))
+∈add' Z θ head Z = head
+∈add' Z θ head (S n) = {!!}
+∈add' (S n) θ head Z = {!!}
+∈add' (S n) θ head (S n') = {!S (∈add' n θ head n')!}
+
 ∈add : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (l' ⊆ (x ∷ l))
-∈add = {!!}
+∈add {l = l1} {x = x1} p θ = ∈add' p θ Z -- {!λ x → if (x ≡e p) then Z else S(θ x)!}
 
 TList = List Type
 
@@ -40,7 +63,7 @@ data Term : TList → Type → Set where
 
 weaking : ∀ {Γ Γ' A} → (Γ' ⊆ Γ) → Term Γ' A → Term Γ A
 weaking θ (Var y) = Var (θ y)
-weaking θ (Λ a y) = {!!} --Λ (∈⊹ Γ1 a) (weaking y)
+weaking {Γ1} θ (Λ {A} {B} a y) = {!Λ Z (weaking{A ∷ Γ1} (xs⊆x∷xs A Γ1) y)!} --Λ (∈⊹ Γ1 a) (weaking y)
 weaking θ (y ∙ y') = (weaking θ y) ∙ (weaking θ y')
 
 var-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
