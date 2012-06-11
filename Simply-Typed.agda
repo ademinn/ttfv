@@ -83,6 +83,8 @@ term-substitution Γ Γ' tm (y₁ ∙ y₂) = term-substitution Γ Γ' tm y₁ �
 substitution : ∀ {Γ A C} → Term Γ A → Term (A ∷ Γ) C → Term Γ C
 substitution = term-substitution [] _
 
+
+
 data isRedex {Γ P} : Term Γ P → Set where
   con : ∀ {σ} (t1 : Term (σ ∷ Γ) P) → (t2 : Term Γ σ) → isRedex ((Λ t1) ∙ t2)
 
@@ -205,6 +207,13 @@ lemma2 (substℓ t p) = redexLast init
 ℓexchange (Λℓ y) = {!!}
 ℓexchange (∙ℓ y y') = {!!}
 ℓexchange (substℓ y y') = {!!}
+
+ℓwk : ∀ {A' Γ Γ'} {t₁ t₂ : Term Γ A'}
+  → (θ : Γ ⊆ Γ') → t₁ ↠ℓ t₂ → (wk θ t₁) ↠ℓ (wk θ t₂) 
+ℓwk θ (consℓ a) = consℓ (θ a)
+ℓwk θ (Λℓ y) = Λℓ (ℓwk (⊆cong Refl θ) y)
+ℓwk θ (∙ℓ y y') = ∙ℓ (ℓwk θ y) (ℓwk θ y')
+ℓwk θ (substℓ y y') = {!substℓ (ℓwk (⊆cong Refl θ) y) (ℓwk θ y')!}
 
 ℓweaking : ∀ {A' Γ} {t₁ t₂ : Term Γ A'}
   → (σ : Type) → t₁ ↠ℓ t₂ → (weaking {A = σ} t₁) ↠ℓ (weaking {A = σ} t₂)
