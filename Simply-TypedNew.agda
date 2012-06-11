@@ -77,4 +77,8 @@ var-substitution (S n) tf Z = Var Z
 var-substitution (S n) tf (S n') = weaking (λ {x} → S) (var-substitution n tf n')
 
 term-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → Term (Γ ⊹ Γ') B → Term ((Γ - a) ⊹ Γ') B
-term-substitution a tf tt = {!!}
+term-substitution {A} {B} {.A ∷ []} Z tf tt = Λ Z tt ∙ tf
+term-substitution {A} {con y} {.A ∷ x ∷ xs} Z tf (Var y') = var-substitution {A} {con y} {A ∷ x ∷ xs} Z tf y'
+term-substitution {A} {con y} {.A ∷ x ∷ xs} Z tf (y' ∙ y0) = term-substitution {A} {Γ = A ∷ x ∷ xs} Z tf y' ∙ term-substitution {A} {Γ = A ∷ x ∷ xs} Z tf y0
+term-substitution {A} {y ↝ y'} {.A ∷ x ∷ xs} {Γ'} Z tf tt = {!!}
+term-substitution (S n) tf tt = {!!}
