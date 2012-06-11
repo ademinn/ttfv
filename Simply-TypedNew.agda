@@ -40,15 +40,16 @@ S n ≡e S n' = n ≡e n'
 
 foo : ∀ {a} {A : Set a} {l : List A} {x₁ x₂ : A}
   → (t₁ : x₁ ∈ l) → (t₂ : x₂ ∈ l) → ((t₁ ≡e t₂) ≡ false) → (x₂ ∈ (l - t₁))
-foo Z Z x = {!!}
-foo Z (S n) x = {!!}
-foo (S n) ts x = {!!}
+foo Z Z ()
+foo Z (S n) x = n
+foo (S n) Z x = Z
+foo (S n) (S n') x = S (foo n n' x)
 
 ∈add' : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (x ∈ (x ∷ l)) → (l' ⊆ (x ∷ l))
 ∈add' Z θ head Z = head
-∈add' Z θ head (S n) = {!!}
-∈add' (S n) θ head Z = {!!}
-∈add' (S n) θ head (S n') = {!S (∈add' n θ head n')!}
+∈add' Z θ head (S n) = S (θ n)
+∈add' (S n) θ head Z = S (θ Z)
+∈add' (S n) θ head (S n') = ∈add' n (λ {x} z → θ (S z)) head n' -- {!S (∈add' n θ head n')!}
 
 ∈add : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (l' ⊆ (x ∷ l))
 ∈add {l = l1} {x = x1} p θ = ∈add' p θ Z -- {!λ x → if (x ≡e p) then Z else S(θ x)!}
