@@ -70,10 +70,11 @@ weaking θ (Λ (S n) y) = Λ Z (weaking (∈add (S n) θ) y)
 weaking θ (y ∙ y') = (weaking θ y) ∙ (weaking θ y')
 
 var-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
-var-substitution Z tf Z = {!tf!}
+var-substitution {A} {.A} {.A ∷ []} Z tf Z = tf
+var-substitution {A} {.A} {.A ∷ x ∷ xs} Z tf Z = weaking (λ {x'} → S) (var-substitution {A} {A} {A ∷ xs} Z tf Z)
 var-substitution Z tf (S n) = Var n
 var-substitution (S n) tf Z = Var Z
-var-substitution (S n) tf (S n') = {!!}
+var-substitution (S n) tf (S n') = weaking (λ {x} → S) (var-substitution n tf n')
 
 term-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → Term (Γ ⊹ Γ') B → Term ((Γ - a) ⊹ Γ') B
 term-substitution a tf tt = {!!}
