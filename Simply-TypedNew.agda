@@ -84,3 +84,10 @@ term-substitution {A} {y1 ↝ y2} {[]} () tf tt
 term-substitution {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = {!!} -- Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-substitution {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf {!!})
 --term-substitution {A} {y ↝ y'} Z tf tt = Λ {!!} (term-substitution Z tf {!!})
 --term-substitution {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-substitution (S n) tf {!!})
+
+-- I'm not sure that this def is correct, but it's the one def that I could write
+data Redex {σ Γ} : {A : Type} → (a : σ ∈ Γ) → Term (Γ - a) A → Set where
+  this   : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a ((Λ a t₁) ∙ t₂)
+  skip2l : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex {A} Z t₁ → Redex a ((Λ a t₁) ∙ t₂)
+  skip2r : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a t₂ → Redex a ((Λ a t₁) ∙ t₂)
+  skipth : ∀ {A} (a : σ ∈ Γ) → (t : Term Γ A) → Redex {A} Z t → Redex a (Λ a t)
