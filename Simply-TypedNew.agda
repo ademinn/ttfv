@@ -64,7 +64,9 @@ data Term : TList → Type → Set where
 
 weaking : ∀ {Γ Γ' A} → (Γ' ⊆ Γ) → Term Γ' A → Term Γ A
 weaking θ (Var y) = Var (θ y)
-weaking {Γ1} θ (Λ {A} {B} a y) = {!Λ Z (weaking{A ∷ Γ1} (xs⊆x∷xs A Γ1) y)!} --Λ (∈⊹ Γ1 a) (weaking y)
+weaking θ (Λ Z y) = Λ Z (weaking (∈add Z θ) y)
+weaking θ (Λ (S n) y) = Λ Z (weaking (∈add (S n) θ) y)
+--weaking {Γ1} θ (Λ {A} {B} a y) = {!Λ Z (weaking{A ∷ Γ1} (xs⊆x∷xs A Γ1) y)!} --Λ (∈⊹ Γ1 a) (weaking y)
 weaking θ (y ∙ y') = (weaking θ y) ∙ (weaking θ y')
 
 var-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
