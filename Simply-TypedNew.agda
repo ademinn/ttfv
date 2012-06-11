@@ -77,8 +77,10 @@ var-substitution (S n) tf Z = Var Z
 var-substitution (S n) tf (S n') = weaking (λ {x} → S) (var-substitution n tf n')
 
 term-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → Term (Γ ⊹ Γ') B → Term ((Γ - a) ⊹ Γ') B
-term-substitution {A} {B} {.A ∷ []} Z tf tt = Λ Z tt ∙ tf
-term-substitution {A} {con y} {.A ∷ x ∷ xs} Z tf (Var y') = var-substitution {A} {con y} {A ∷ x ∷ xs} Z tf y'
-term-substitution {A} {con y} {.A ∷ x ∷ xs} Z tf (y' ∙ y0) = term-substitution {A} {Γ = A ∷ x ∷ xs} Z tf y' ∙ term-substitution {A} {Γ = A ∷ x ∷ xs} Z tf y0
-term-substitution {A} {y ↝ y'} {.A ∷ x ∷ xs} {Γ'} Z tf tt = {!!}
-term-substitution (S n) tf tt = {!!}
+term-substitution {A} {con y} n tf (Var y') = var-substitution {A} {con y} n tf y'
+term-substitution {A} {con y} n tf (y0 ∙ y1) = term-substitution n tf y0 ∙ term-substitution n tf y1
+term-substitution {A} {y1 ↝ y2} {[]} () tf tt
+-- Here I REALLY NEED to pattern-match by tt! Or… mm… proof of tt is made by Λ constructor (because, in fact, we should substitute in {!!} second arg of Λ, check it)
+term-substitution {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = {!!} -- Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-substitution {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf {!!})
+--term-substitution {A} {y ↝ y'} Z tf tt = Λ {!!} (term-substitution Z tf {!!})
+--term-substitution {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-substitution (S n) tf {!!})
