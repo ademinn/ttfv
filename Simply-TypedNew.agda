@@ -69,21 +69,21 @@ weaking θ (Λ (S n) y) = Λ Z (weaking (∈add (S n) θ) y)
 --weaking {Γ1} θ (Λ {A} {B} a y) = {!Λ Z (weaking{A ∷ Γ1} (xs⊆x∷xs A Γ1) y)!} --Λ (∈⊹ Γ1 a) (weaking y)
 weaking θ (y ∙ y') = (weaking θ y) ∙ (weaking θ y')
 
-var-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
-var-substitution {A} {.A} {.A ∷ []} Z tf Z = tf
-var-substitution {A} {.A} {.A ∷ x ∷ xs} Z tf Z = weaking (λ {x'} → S) (var-substitution {A} {A} {A ∷ xs} Z tf Z)
-var-substitution Z tf (S n) = Var n
-var-substitution (S n) tf Z = Var Z
-var-substitution (S n) tf (S n') = weaking (λ {x} → S) (var-substitution n tf n')
+var-subst : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → (B ∈ (Γ ⊹ Γ')) → Term ((Γ - a) ⊹ Γ') B
+var-subst {A} {.A} {.A ∷ []} Z tf Z = tf
+var-subst {A} {.A} {.A ∷ x ∷ xs} Z tf Z = weaking (λ {x'} → S) (var-subst {A} {A} {A ∷ xs} Z tf Z)
+var-subst Z tf (S n) = Var n
+var-subst (S n) tf Z = Var Z
+var-subst (S n) tf (S n') = weaking (λ {x} → S) (var-subst n tf n')
 
-term-substitution : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → Term (Γ ⊹ Γ') B → Term ((Γ - a) ⊹ Γ') B
-term-substitution {A} {con y} n tf (Var y') = var-substitution {A} {con y} n tf y'
-term-substitution {A} {con y} n tf (y0 ∙ y1) = term-substitution n tf y0 ∙ term-substitution n tf y1
-term-substitution {A} {y1 ↝ y2} {[]} () tf tt
+term-subst : ∀ {A B Γ Γ'} → (a : A ∈ Γ) → Term Γ' A → Term (Γ ⊹ Γ') B → Term ((Γ - a) ⊹ Γ') B
+term-subst {A} {con y} n tf (Var y') = var-subst {A} {con y} n tf y'
+term-subst {A} {con y} n tf (y0 ∙ y1) = term-subst n tf y0 ∙ term-subst n tf y1
+term-subst {A} {y1 ↝ y2} {[]} () tf tt
 -- Here I REALLY NEED to pattern-match by tt! Or… mm… proof of tt is made by Λ constructor (because, in fact, we should substitute in {!!} second arg of Λ, check it)
-term-substitution {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = {!!} -- Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-substitution {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf {!!})
---term-substitution {A} {y ↝ y'} Z tf tt = Λ {!!} (term-substitution Z tf {!!})
---term-substitution {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-substitution (S n) tf {!!})
+term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-subst {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf {!!})
+--term-subst {A} {y ↝ y'} Z tf tt = Λ {!!} (term-subst Z tf {!!})
+--term-subst {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-subst (S n) tf {!!})
 
 -- I'm not sure that this def is correct, but it's the one def that I could write
 data Redex {σ Γ} : {A : Type} → (a : σ ∈ Γ) → Term (Γ - a) A → Set where

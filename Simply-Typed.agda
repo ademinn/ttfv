@@ -201,6 +201,7 @@ lemma2 (substℓ t p) = redexLast init
     p₁ = lemma2 p
     init = join (skipthProof' t₁) p₁
 
+{-
 ℓexchange : ∀ {A B C Γ} {t₁ t₂ : Term (A ∷ B ∷ Γ) C}
   → t₁ ↠ℓ t₂ → (exchange t₁) ↠ℓ (exchange t₂)
 ℓexchange (consℓ a) = consℓterm (exchange (Var a))
@@ -213,7 +214,7 @@ lemma2 (substℓ t p) = redexLast init
 ℓwk θ (consℓ a) = consℓ (θ a)
 ℓwk θ (Λℓ y) = Λℓ (ℓwk (⊆cong Refl θ) y)
 ℓwk θ (∙ℓ y y') = ∙ℓ (ℓwk θ y) (ℓwk θ y')
-ℓwk θ (substℓ y y') = {!substℓ (ℓwk (⊆cong Refl θ) y) (ℓwk θ y')!}
+ℓwk θ (substℓ y y') = substℓ (ℓwk (⊆cong Refl θ) {!!}) (ℓwk θ y') -- {!substℓ (ℓwk (⊆cong Refl θ) y) (ℓwk θ y')!}
 
 ℓweaking : ∀ {A' Γ} {t₁ t₂ : Term Γ A'}
   → (σ : Type) → t₁ ↠ℓ t₂ → (weaking {A = σ} t₁) ↠ℓ (weaking {A = σ} t₂)
@@ -227,10 +228,10 @@ lemma2 (substℓ t p) = redexLast init
 ℓfirst (Λℓ y) = Λ (ℓfirst y)
 ℓfirst (∙ℓ y y') = ℓfirst y ∙ ℓfirst y'
 ℓfirst (substℓ y y') = Λ (ℓfirst y) ∙ ℓfirst y'
-
---pickup : ∀ {} (Term )
+-}
 
 -- 2006 - page 13, lemma 1.4.2 (iii)
+{-
 lemma3 : ∀ {σ A Γ} {t₁ t₂ : Term (σ ∷ Γ) A} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (substitution p₁ t₁) ↠ℓ (substitution p₂ t₂)
 lemma3 (consℓ Z) p = p
 lemma3 (consℓ (S n)) p = consℓ n
@@ -247,6 +248,7 @@ tlemma3 {Γ = σ' ∷ Γ1} (consℓ (S n)) pp = {!ℓweaking σ' (tlemma3 {Γ = 
 tlemma3 (Λℓ y) pp = {!!}
 tlemma3 (∙ℓ y y') pp = {!!}
 tlemma3 (substℓ y y') pp = {!!}
+-}
 
 _* : ∀ {Γ A} → Term Γ A → Term Γ A
 (Var a)* = Var a
