@@ -7,6 +7,7 @@ open import Level
 open import ListProofs
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
+open import Data.Product
 
 -- ↝ is \r~
 infixr 5 _↝_
@@ -156,8 +157,8 @@ redexLast {σ} {Γ} {A} {t₁} {t₂} (consβ .(Λ t₁ ∙ t₂)) = succβ (con
 redexLast {σ} {Γ} {A} {t₁} {t₂} (succβ y y') = succβ (succβ y y') (reduce (Λ t₁ ∙ t₂) (this t₁ t₂))
 
 -- just "&&" and ","
-data _&&_ (A B : Set) : Set where
-  _,_ : A → B → A && B
+--data _&&_ (A B : Set) : Set where
+--  _,_ : A → B → A && B
 
 
 -- ℓ is \ell
@@ -266,3 +267,6 @@ lemma4 (∙ℓ (consℓ a) p) = ∙ℓ (lemma4 (consℓ a)) (lemma4 p)
 lemma4 (∙ℓ (∙ℓ y y') p) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 p)
 lemma4 (∙ℓ (substℓ y y') p) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 p)
 lemma4 (substℓ t p) = lemma3 (lemma4 t) (lemma4 p)
+
+CR : ∀ {Γ A} {t t₁ t₂ : Term Γ A} → t ↠β t₁ → t ↠β t₂ → ∃ (λ r → ((t₁ ↠β r) × (t₂ ↠β r)))
+CR {Γ} {A} {t} {t₁} {t₂} b1 b2 = t * , ({!!} , {!!})
