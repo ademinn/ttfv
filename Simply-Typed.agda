@@ -126,9 +126,11 @@ head : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠β t₂ → Term Γ A
 head (consβ t) = t
 head (succβ t _) = head t
 
+{-
 tail : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠β t₂ → Term Γ A
 tail (consβ t) = t
 tail (succβ _ (reduce t r)) = applyReduction r
+-}
 
 skip2lProof' : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ ↠β t₂ → (t₁ ∙ t') ↠β (t₂ ∙ t')
 skip2lProof' t' (consβ t) = consβ (t ∙ t')
@@ -268,5 +270,11 @@ lemma4 (∙ℓ (∙ℓ y y') p) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 p)
 lemma4 (∙ℓ (substℓ y y') p) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 p)
 lemma4 (substℓ t p) = lemma3 (lemma4 t) (lemma4 p)
 
+-- data ℓlist
+
+preCR : ∀ {Γ A} {t t₁ : Term Γ A} → t ↠β t₁ → t₁ ↠β t *
+preCR {Γ} {A} {.t₁} {t₁} (consβ .t₁) = lemma2 (lemma4 (consℓterm t₁))
+preCR {Γ} {A} {t} {t₁} (succβ y y') = {!!}
+
 CR : ∀ {Γ A} {t t₁ t₂ : Term Γ A} → t ↠β t₁ → t ↠β t₂ → ∃ (λ r → ((t₁ ↠β r) × (t₂ ↠β r)))
-CR {Γ} {A} {t} {t₁} {t₂} b1 b2 = t * , ({!!} , {!!})
+CR {Γ} {A} {t} {t₁} {t₂} b1 b2 = t * , (preCR b1 , preCR b2)
