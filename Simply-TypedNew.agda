@@ -86,8 +86,18 @@ term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x 
 --term-subst {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-subst (S n) tf {!!})
 
 -- I'm not sure that this def is correct, but it's the one def that I could write
+{-
 data Redex {σ Γ} : {A : Type} → (a : σ ∈ Γ) → Term (Γ - a) A → Set where
   this   : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a ((Λ a t₁) ∙ t₂)
   skip2l : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex {A} Z t₁ → Redex a ((Λ a t₁) ∙ t₂)
   skip2r : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a t₂ → Redex a ((Λ a t₁) ∙ t₂)
   skipth : ∀ {A} (a : σ ∈ Γ) → (t : Term Γ A) → Redex {A} Z t → Redex a (Λ a t)
+-}
+
+data Redex : {Γ : TList} {A : Type} → (Term Γ A) → Set where
+  this   : ∀ {A σ Γ} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex ((Λ a t₁) ∙ t₂)
+  skip2l : ∀ {A σ Γ} (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₁ → Redex (t₁ ∙ t₂)
+  skip2r : ∀ {A σ Γ} (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₂ → Redex (t₁ ∙ t₂)
+  skipth : ∀ {A σ Γ} (a : σ ∈ Γ) → (t : Term Γ A) → Redex t → Redex (Λ a t)
+
+--applyReduction : (Redex in t) → Term
