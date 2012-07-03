@@ -158,6 +158,10 @@ redexLast : ∀ {σ Γ A} {t₁ : Term (σ ∷ Γ) A} {t₂ : Term Γ σ} {t : T
 redexLast {σ} {Γ} {A} {t₁} {t₂} (consβ .(Λ t₁ ∙ t₂)) = succβ (consβ (Λ t₁ ∙ t₂)) (reduce (Λ t₁ ∙ t₂) (this t₁ t₂))
 redexLast {σ} {Γ} {A} {t₁} {t₂} (succβ y y') = succβ (succβ y y') (reduce (Λ t₁ ∙ t₂) (this t₁ t₂))
 
+β-trans : ∀ {Γ A} {t1 t2 t3 : Term Γ A} → (t1 ↠β t2) → (t2 ↠β t3) → (t1 ↠β t3)
+β-trans {Γ} {A} {t1} {.t3} {t3} a (consβ .t3) = a
+β-trans a (succβ y y') = succβ (β-trans a y) y'
+
 -- just "&&" and ","
 --data _&&_ (A B : Set) : Set where
 --  _,_ : A → B → A && B
@@ -272,9 +276,21 @@ lemma4 (substℓ t p) = lemma3 (lemma4 t) (lemma4 p)
 
 -- data ℓlist
 
+ℓ-trans : ∀ {Γ A} {t₁ t₂ t₃ : Term Γ A} → t₁ ↠ℓ t₂ → t₂ ↠ℓ t₃ → t₁ ↠ℓ t₃
+ℓ-trans (consℓ a) b = b
+ℓ-trans (Λℓ y) (Λℓ y') = Λℓ (ℓ-trans y y')
+ℓ-trans (∙ℓ y y') (∙ℓ y0 y1) = ∙ℓ (ℓ-trans y y0) (ℓ-trans y' y1)
+ℓ-trans (∙ℓ y y') (substℓ y0 y1) = {!!}
+ℓ-trans {[]} (substℓ y y') b = {!!}
+ℓ-trans {x ∷ xs} (substℓ y y') b = {!!}
+
+conv↠β↠ℓ : ∀ {Γ A} {t1 t2 : Term Γ A} → t1 ↠β t2 → t1 ↠ℓ t2
+conv↠β↠ℓ {Γ} {A} {.t2} {t2} (consβ .t2) = consℓterm t2
+conv↠β↠ℓ (succβ y y') = ℓ-trans (conv↠β↠ℓ y) (lemma1 y')
+
 preCR : ∀ {Γ A} {t t₁ : Term Γ A} → t ↠β t₁ → t₁ ↠β t *
 preCR {Γ} {A} {.t₁} {t₁} (consβ .t₁) = lemma2 (lemma4 (consℓterm t₁))
-preCR {Γ} {A} {t} {t₁} (succβ y y') = {!!}
+preCR {Γ} {A} {t} {t₁} (succβ y y') = lemma2 (lemma4 (ℓ-trans (conv↠β↠ℓ y) (lemma1 y')))
 
 CR : ∀ {Γ A} {t t₁ t₂ : Term Γ A} → t ↠β t₁ → t ↠β t₂ → ∃ (λ r → ((t₁ ↠β r) × (t₂ ↠β r)))
 CR {Γ} {A} {t} {t₁} {t₂} b1 b2 = t * , (preCR b1 , preCR b2)
