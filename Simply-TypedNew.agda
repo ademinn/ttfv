@@ -18,6 +18,9 @@ _-_ : ∀ {a} {A : Set a} {x : A} → (l : List A) → (x ∈ l) → List A
 (x ∷ xs) - (S n) = x ∷ (xs - n)
 [] - ()
 
+data _≣_ {a} {A : Set a} : List A → List A → Set a where
+  LRefl : (l1 l2 : List A) → (l1 ⊆ l2) → (l2 ⊆ l1) → l1 ≣ l2
+
 _≡e_ : ∀ {a} {A : Set a} {x y : A} {l : List A} → (x ∈ l) → (y ∈ l) → Bool
 Z ≡e Z = true
 Z ≡e S n = false
@@ -37,6 +40,10 @@ S n ≡e S n' = n ≡e n'
 
 ∈⊹ : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (l' ⊆ l) → (x ∈ l') → (x ∈ l)
 ∈⊹ θ a = θ a
+
++a-a : ∀ {l} {A : Set l} {Γ} → (a : A ∈ Γ) → ((A ∷ (Γ - a)) ⊆ Γ)
++a-a Z = λ z → z
++a-a (S n) = {!!}
 
 foo : ∀ {a} {A : Set a} {l : List A} {x₁ x₂ : A}
   → (t₁ : x₁ ∈ l) → (t₂ : x₂ ∈ l) → ((t₁ ≡e t₂) ≡ false) → (x₂ ∈ (l - t₁))
@@ -62,6 +69,9 @@ data Term : TList → Type → Set where
   Λ   : ∀ {A B Γ} → (a : A ∈ Γ) → Term Γ B → Term (Γ - a) (A ↝ B)
   _∙_ : ∀ {A B Γ} → Term Γ (A ↝ B) → Term Γ A → Term Γ B
 
+--perm : ∀ {Γ Γ' A} → Term Γ A → (Γ ≣ Γ') → Term Γ' A
+--perm t r = {!!}
+
 weaking : ∀ {Γ Γ' A} → (Γ' ⊆ Γ) → Term Γ' A → Term Γ A
 weaking θ (Var y) = Var (θ y)
 weaking θ (Λ Z y) = Λ Z (weaking (∈add Z θ) y)
@@ -85,6 +95,9 @@ term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x 
 --term-subst {A} {y ↝ y'} Z tf tt = Λ {!!} (term-subst Z tf {!!})
 --term-subst {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-subst (S n) tf {!!})
 
+subst : ∀ {A Γ σ} (a : A ∈ Γ) → Term (Γ - a) A → Term Γ σ → Term (Γ - a) σ
+subst {A} {Γ} {σ} a t1 t2 = term-subst {A} {σ} {[ A ]} {Γ - a} Z t1 {!!}
+
 -- I'm not sure that this def is correct, but it's the one def that I could write
 {-
 data Redex {σ Γ} : {A : Type} → (a : σ ∈ Γ) → Term (Γ - a) A → Set where
@@ -100,4 +113,8 @@ data Redex : {Γ : TList} {A : Type} → (Term Γ A) → Set where
   skip2r : ∀ {A σ Γ} (t₁ : Term Γ (σ ↝ A)) → (t₂ : Term Γ σ) → Redex t₂ → Redex (t₁ ∙ t₂)
   skipth : ∀ {A σ Γ} (a : σ ∈ Γ) → (t : Term Γ A) → Redex t → Redex (Λ a t)
 
---applyReduction : (Redex in t) → Term
+applyReduction : ∀ {A} {Γ} {t : Term Γ A} → Redex t → Term Γ A
+applyReduction (this a t₁ t₂) = term-subst {!!} {!!} {!!}
+applyReduction (skip2l t₁ t₂ y) = {!!}
+applyReduction (skip2r t₁ t₂ y) = {!!}
+applyReduction (skipth a t y) = {!!}
