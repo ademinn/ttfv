@@ -115,3 +115,6 @@ applyReduction (this a t₁ t₂) = subst a t₂ t₁
 applyReduction (skip2l t₁ t₂ y) = (applyReduction y) ∙ t₂
 applyReduction (skip2r t₁ t₂ y) = t₁ ∙ (applyReduction y)
 applyReduction (skipth a t y) = Λ a (applyReduction y)
+
+data _→β_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
+  reduce : ∀ {A} (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
