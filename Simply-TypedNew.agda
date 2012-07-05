@@ -41,9 +41,15 @@ S n ≡e S n' = n ≡e n'
 ∈⊹ : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (l' ⊆ l) → (x ∈ l') → (x ∈ l)
 ∈⊹ θ a = θ a
 
-+a-a : ∀ {l} {A : Set l} {Γ} → (a : A ∈ Γ) → ((A ∷ (Γ - a)) ⊆ Γ)
-+a-a Z = λ z → z
-+a-a (S n) = {!!}
+x∈xs,x∈y∷xs : ∀ {l} {x y : Set l} {xs} → (x ∈ xs) → (x ∈ y ∷ xs)
+x∈xs,x∈y∷xs Z = S Z
+x∈xs,x∈y∷xs (S n) = S (x∈xs,x∈y∷xs n)
+
++a-aT : ∀ {l} {A x : Set l} {Γ} → (a : A ∈ Γ) → (x ∈ Γ) → (x ∈ (A ∷ (Γ - a)))
++a-aT n1 n2 = {!!}
+
++a-a : ∀ {l} {A : Set l} {Γ} → (a : A ∈ Γ) → (Γ ⊆ (A ∷ (Γ - a)))
++a-a n = +a-aT n
 
 foo : ∀ {a} {A : Set a} {l : List A} {x₁ x₂ : A}
   → (t₁ : x₁ ∈ l) → (t₂ : x₂ ∈ l) → ((t₁ ≡e t₂) ≡ false) → (x₂ ∈ (l - t₁))
@@ -59,7 +65,7 @@ foo (S n) (S n') x = S (foo n n' x)
 ∈add' (S n) θ head (S n') = ∈add' n (λ {x} z → θ (S z)) head n' -- {!S (∈add' n θ head n')!}
 
 ∈add : ∀ {a} {A : Set a} {l l' : List A} {x : A} → (p : x ∈ l') → ((l' - p) ⊆ l) → (l' ⊆ (x ∷ l))
-∈add {l = l1} {x = x1} p θ = ∈add' p θ Z -- {!λ x → if (x ≡e p) then Z else S(θ x)!}
+∈add p θ = ∈add' p θ Z -- {!λ x → if (x ≡e p) then Z else S(θ x)!}
 
 TList = List Type
 
@@ -96,16 +102,7 @@ term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x 
 --term-subst {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-subst (S n) tf {!!})
 
 subst : ∀ {A Γ σ} (a : A ∈ Γ) → Term (Γ - a) A → Term Γ σ → Term (Γ - a) σ
-subst {A} {Γ} {σ} a t1 t2 = term-subst {A} {σ} {[ A ]} {Γ - a} Z t1 {!!}
-
--- I'm not sure that this def is correct, but it's the one def that I could write
-{-
-data Redex {σ Γ} : {A : Type} → (a : σ ∈ Γ) → Term (Γ - a) A → Set where
-  this   : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a ((Λ a t₁) ∙ t₂)
-  skip2l : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex {A} Z t₁ → Redex a ((Λ a t₁) ∙ t₂)
-  skip2r : ∀ {A} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex a t₂ → Redex a ((Λ a t₁) ∙ t₂)
-  skipth : ∀ {A} (a : σ ∈ Γ) → (t : Term Γ A) → Redex {A} Z t → Redex a (Λ a t)
--}
+subst {A} {Γ} {σ} a t1 t2 = term-subst {A} {σ} {[ A ]} {Γ - a} Z t1 (weaking (λ {x} b → {!+a-a ? ?!}) t2)
 
 data Redex : {Γ : TList} {A : Type} → (Term Γ A) → Set where
   this   : ∀ {A σ Γ} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex ((Λ a t₁) ∙ t₂)
@@ -114,7 +111,7 @@ data Redex : {Γ : TList} {A : Type} → (Term Γ A) → Set where
   skipth : ∀ {A σ Γ} (a : σ ∈ Γ) → (t : Term Γ A) → Redex t → Redex (Λ a t)
 
 applyReduction : ∀ {A} {Γ} {t : Term Γ A} → Redex t → Term Γ A
-applyReduction (this a t₁ t₂) = term-subst {!!} {!!} {!!}
-applyReduction (skip2l t₁ t₂ y) = {!!}
-applyReduction (skip2r t₁ t₂ y) = {!!}
-applyReduction (skipth a t y) = {!!}
+applyReduction (this a t₁ t₂) = subst a t₂ t₁
+applyReduction (skip2l t₁ t₂ y) = (applyReduction y) ∙ t₂
+applyReduction (skip2r t₁ t₂ y) = t₁ ∙ (applyReduction y)
+applyReduction (skipth a t y) = Λ a (applyReduction y)
