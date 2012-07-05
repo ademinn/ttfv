@@ -168,3 +168,11 @@ consℓterm : ∀ {Γ A} → (t : Term Γ A) → t ↠ℓ t
 consℓterm (Var y) = consℓ y
 consℓterm (Λ a y) = Λℓ (consℓterm y)
 consℓterm (y ∙ y') = ∙ℓ (consℓterm y) (consℓterm y')
+
+-- 2006 - page 13, lemma 1.4.2 (i)
+lemma1 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → t₁ ↠ℓ t₂
+lemma1 {Γ} {A} {Var y} (reduce .(Var y) ())
+lemma1 (reduce (Λ a y) (skipth .a .y y')) = Λℓ (lemma1 (reduce y y'))
+lemma1 (reduce (Λ a t₁ ∙ y') (this .a .t₁ .y')) = substℓ (consℓterm t₁) (consℓterm y')
+lemma1 {Γ} {A} {y ∙ y'} (reduce .(y ∙ y') (skip2l .y .y' y0)) = ∙ℓ (lemma1 (reduce y y0)) (consℓterm y')
+lemma1 {Γ} {A} {y ∙ y'} (reduce .(y ∙ y') (skip2r .y .y' y0)) = ∙ℓ (consℓterm y) (lemma1 (reduce y' y0))
