@@ -163,3 +163,8 @@ data _↠ℓ_ : ∀ {Γ} {A : Type} → Term Γ A → Term Γ A → Set where
   Λℓ : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → (Λ a t₁) ↠ℓ (Λ a t₂)
   ∙ℓ : ∀ {σ A Γ} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (t₁ ∙ p₁) ↠ℓ (t₂ ∙ p₂)
   substℓ : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} {p₁ p₂ : Term (Γ - a) σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → ((Λ a t₁) ∙ p₁) ↠ℓ (subst a p₂ t₂)
+
+consℓterm : ∀ {Γ A} → (t : Term Γ A) → t ↠ℓ t
+consℓterm (Var y) = consℓ y
+consℓterm (Λ a y) = Λℓ (consℓterm y)
+consℓterm (y ∙ y') = ∙ℓ (consℓterm y) (consℓterm y')
