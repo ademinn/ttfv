@@ -153,3 +153,7 @@ join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join 
     t' = (reduce t rt)
     p' = (reduce p rp)
     t'' = applyReduction rt
+
+β-trans : ∀ {Γ A} {t1 t2 t3 : Term Γ A} → (t1 ↠β t2) → (t2 ↠β t3) → (t1 ↠β t3)
+β-trans {Γ} {A} {t1} {.t3} {.t3} a (consβ t3) = a
+β-trans a (succβ y y') = succβ (β-trans a y) y'
