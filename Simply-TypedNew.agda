@@ -143,3 +143,13 @@ skip2rProof' t' (succβ tt t) = succβ (skip2rProof' t' tt) (skip2rProof t' t)
 skipthProof' : ∀ {σ Γ A} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} → t₁ ↠β t₂ → (Λ a t₁) ↠β (Λ a t₂)
 skipthProof' {a = a} (consβ t) = consβ (Λ a t)
 skipthProof' (succβ tt t) = succβ (skipthProof' tt) (skipthProof t)
+
+join : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠β t₂ → p₁ ↠β p₂ → (t₁ ∙ p₁) ↠β (t₂ ∙ p₂)
+join (consβ t) (consβ p) = consβ (t ∙ p)
+join (consβ t) p = skip2rProof' t p
+join t (consβ p) = skip2lProof' p t
+join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join tt pp) (skip2lProof p t')) (skip2rProof t'' p')
+  where
+    t' = (reduce t rt)
+    p' = (reduce p rp)
+    t'' = applyReduction rt
