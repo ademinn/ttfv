@@ -157,3 +157,9 @@ join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join 
 β-trans : ∀ {Γ A} {t1 t2 t3 : Term Γ A} → (t1 ↠β t2) → (t2 ↠β t3) → (t1 ↠β t3)
 β-trans {Γ} {A} {t1} {.t3} {.t3} a (consβ t3) = a
 β-trans a (succβ y y') = succβ (β-trans a y) y'
+
+data _↠ℓ_ : ∀ {Γ} {A : Type} → Term Γ A → Term Γ A → Set where
+  consℓ : ∀ {A Γ} (a : A ∈ Γ) → (Var a) ↠ℓ (Var a)
+  Λℓ : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → (Λ a t₁) ↠ℓ (Λ a t₂)
+  ∙ℓ : ∀ {σ A Γ} {t₁ t₂ : Term Γ (σ ↝ A)} {p₁ p₂ : Term Γ σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (t₁ ∙ p₁) ↠ℓ (t₂ ∙ p₂)
+  substℓ : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} {p₁ p₂ : Term (Γ - a) σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → ((Λ a t₁) ∙ p₁) ↠ℓ (subst a p₂ t₂)
