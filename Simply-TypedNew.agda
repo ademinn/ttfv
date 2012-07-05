@@ -118,3 +118,7 @@ applyReduction (skipth a t y) = Λ a (applyReduction y)
 
 data _→β_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
   reduce : ∀ {A} (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
+
+data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
+  consβ : (t : Term Γ A) → t ↠β t
+  succβ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
