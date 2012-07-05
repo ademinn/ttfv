@@ -119,6 +119,15 @@ applyReduction (skipth a t y) = Λ a (applyReduction y)
 data _→β_ {Γ} : {A : Type} → Term Γ A → Term Γ A → Set where
   reduce : ∀ {A} (t : Term Γ A) → (r : Redex t) → t →β (applyReduction r)
 
+skip2lProof : ∀ {σ Γ A} {t₁ t₂ : Term Γ (σ ↝ A)} → (t' : Term Γ σ) → t₁ →β t₂ → (t₁ ∙ t') →β (t₂ ∙ t')
+skip2lProof t' (reduce t r) = reduce (t ∙ t') (skip2l t t' r)
+
+skip2rProof : ∀ {σ Γ A} {t₁ t₂ : Term Γ σ} → (t' : Term Γ (σ ↝ A)) → t₁ →β t₂ → (t' ∙ t₁) →β (t' ∙ t₂)
+skip2rProof t' (reduce t r) = reduce (t' ∙ t) (skip2r t' t r)
+
+skipthProof : ∀ {σ Γ A} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} → t₁ →β t₂ → (Λ a t₁) →β (Λ a t₂)
+skipthProof {a = a} (reduce t r) = reduce (Λ a t) (skipth a t r)
+
 data _↠β_ {Γ A} : Term Γ A → Term Γ A → Set where
   consβ : (t : Term Γ A) → t ↠β t
   succβ : ∀ {t₁ t₂ t₃} → t₁ ↠β t₂ → t₂ →β t₃ → t₁ ↠β t₃
