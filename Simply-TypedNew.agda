@@ -154,6 +154,10 @@ join (succβ tt (reduce t rt)) (succβ pp (reduce p rp)) = succβ (succβ (join 
     p' = (reduce p rp)
     t'' = applyReduction rt
 
+redexLast : ∀ {σ Γ A} {a : σ ∈ Γ} {t₁ : Term Γ A} {t₂ : Term (Γ - a) σ} {t : Term (Γ - a) A} → t ↠β ((Λ a t₁) ∙ t₂) → t ↠β (applyReduction (this a t₁ t₂))
+redexLast {σ} {Γ} {A} {a} {t₁} {t₂} (consβ .(Λ a t₁ ∙ t₂)) = succβ (consβ (Λ a t₁ ∙ t₂)) (reduce (Λ a t₁ ∙ t₂) (this a t₁ t₂))
+redexLast {σ} {Γ} {A} {a} {t₁} {t₂} (succβ y y') = succβ (succβ y y') (reduce (Λ a t₁ ∙ t₂) (this a t₁ t₂))
+
 β-trans : ∀ {Γ A} {t1 t2 t3 : Term Γ A} → (t1 ↠β t2) → (t2 ↠β t3) → (t1 ↠β t3)
 β-trans {Γ} {A} {t1} {.t3} {.t3} a (consβ t3) = a
 β-trans a (succβ y y') = succβ (β-trans a y) y'
@@ -176,3 +180,20 @@ lemma1 (reduce (Λ a y) (skipth .a .y y')) = Λℓ (lemma1 (reduce y y'))
 lemma1 (reduce (Λ a t₁ ∙ y') (this .a .t₁ .y')) = substℓ (consℓterm t₁) (consℓterm y')
 lemma1 {Γ} {A} {y ∙ y'} (reduce .(y ∙ y') (skip2l .y .y' y0)) = ∙ℓ (lemma1 (reduce y y0)) (consℓterm y')
 lemma1 {Γ} {A} {y ∙ y'} (reduce .(y ∙ y') (skip2r .y .y' y0)) = ∙ℓ (consℓterm y) (lemma1 (reduce y' y0))
+
+-- 2006 - page 13, lemma 1.4.2 (ii)
+lemma2 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₁ ↠β t₂
+lemma2 (consℓ a) = consβ (Var a)
+lemma2 (Λℓ y) = skipthProof' (lemma2 y)
+lemma2 (∙ℓ y y') = join (lemma2 y) (lemma2 y')
+lemma2 (substℓ y y') = redexLast (join (skipthProof' (lemma2 y)) (lemma2 y'))
+
+-- 2006 - page 13, lemma 1.4.2 (iii)
+lemma3 : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} {p₁ p₂ : Term (Γ - a) σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (subst a p₁ t₁) ↠ℓ (subst a p₂ t₂)
+lemma3 t p = {!!}
+
+_* : ∀ {Γ A} → Term Γ A → Term Γ A
+Var y * = Var y
+Λ a y * = Λ a (y *)
+((Λ a y) ∙ y') * = subst a (y' *) (y *)
+(y ∙ y') * = (y *) ∙ (y' *)
