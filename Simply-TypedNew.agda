@@ -197,3 +197,12 @@ Var y * = Var y
 Λ a y * = Λ a (y *)
 ((Λ a y) ∙ y') * = subst a (y' *) (y *)
 (y ∙ y') * = (y *) ∙ (y' *)
+
+lemma4 : ∀ {Γ A} {t₁ t₂ : Term Γ A} → t₁ ↠ℓ t₂ → t₂ ↠ℓ (t₁ *)
+lemma4 (consℓ a) = consℓ a
+lemma4 (Λℓ y) = Λℓ (lemma4 y)
+lemma4 (∙ℓ (consℓ a) y') = ∙ℓ (lemma4 (consℓ a)) (lemma4 y')
+lemma4 (∙ℓ (Λℓ y) y') = substℓ (lemma4 y) (lemma4 y')
+lemma4 (∙ℓ (∙ℓ y y') y0) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 y0)
+lemma4 (∙ℓ (substℓ y y') y0) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 y0)
+lemma4 (substℓ y y') = lemma3 (lemma4 y) (lemma4 y')
