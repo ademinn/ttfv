@@ -7,6 +7,7 @@ open import Level
 open import ListProofs
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
+open import Data.Product
 
 infixr 5 _↝_
 data Type : Set where
@@ -217,3 +218,10 @@ lemma4 (substℓ y y') = lemma3 (lemma4 y) (lemma4 y')
 conv↠β↠ℓ : ∀ {Γ A} {t1 t2 : Term Γ A} → t1 ↠β t2 → t1 ↠ℓ t2
 conv↠β↠ℓ {Γ} {A} {.t2} {t2} (consβ .t2) = consℓterm t2
 conv↠β↠ℓ (succβ y y') = ℓ-trans (conv↠β↠ℓ y) (lemma1 y')
+
+preCR : ∀ {Γ A} {t t₁ : Term Γ A} → t ↠β t₁ → t₁ ↠β t *
+preCR {Γ} {A} {.t₁} {t₁} (consβ .t₁) = lemma2 (lemma4 (consℓterm t₁))
+preCR (succβ y y') = lemma2 (lemma4 (ℓ-trans (conv↠β↠ℓ y) (lemma1 y')))
+
+CR : ∀ {Γ A} {t t₁ t₂ : Term Γ A} → t ↠β t₁ → t ↠β t₂ → ∃ (λ r → ((t₁ ↠β r) × (t₂ ↠β r)))
+CR {t = t} b1 b2 = t * ,(preCR b1 , preCR b2)
