@@ -213,3 +213,7 @@ lemma4 (substℓ y y') = lemma3 (lemma4 y) (lemma4 y')
 ℓ-trans (∙ℓ y y') (∙ℓ y0 y1) = ∙ℓ (ℓ-trans y y0) (ℓ-trans y' y1)
 ℓ-trans (∙ℓ y y') (substℓ y0 y1) = {!!}
 ℓ-trans (substℓ y y') b = {!!}
+
+conv↠β↠ℓ : ∀ {Γ A} {t1 t2 : Term Γ A} → t1 ↠β t2 → t1 ↠ℓ t2
+conv↠β↠ℓ {Γ} {A} {.t2} {t2} (consβ .t2) = consℓterm t2
+conv↠β↠ℓ (succβ y y') = ℓ-trans (conv↠β↠ℓ y) (lemma1 y')
