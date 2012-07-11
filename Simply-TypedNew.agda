@@ -206,3 +206,10 @@ lemma4 (∙ℓ (Λℓ y) y') = substℓ (lemma4 y) (lemma4 y')
 lemma4 (∙ℓ (∙ℓ y y') y0) = ∙ℓ (lemma4 (∙ℓ y y')) (lemma4 y0)
 lemma4 (∙ℓ (substℓ y y') y0) = ∙ℓ (lemma4 (substℓ y y')) (lemma4 y0)
 lemma4 (substℓ y y') = lemma3 (lemma4 y) (lemma4 y')
+
+ℓ-trans : ∀ {Γ A} {t₁ t₂ t₃ : Term Γ A} → t₁ ↠ℓ t₂ → t₂ ↠ℓ t₃ → t₁ ↠ℓ t₃
+ℓ-trans (consℓ a) b = b
+ℓ-trans (Λℓ y) (Λℓ y') = Λℓ (ℓ-trans y y')
+ℓ-trans (∙ℓ y y') (∙ℓ y0 y1) = ∙ℓ (ℓ-trans y y0) (ℓ-trans y' y1)
+ℓ-trans (∙ℓ y y') (substℓ y0 y1) = {!!}
+ℓ-trans (substℓ y y') b = {!!}
