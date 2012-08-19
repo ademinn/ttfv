@@ -47,7 +47,9 @@ x∈xs,x∈y∷xs Z = S Z
 x∈xs,x∈y∷xs (S n) = S (x∈xs,x∈y∷xs n)
 
 +a-aT : ∀ {l} {A x : Set l} {Γ} → (a : A ∈ Γ) → (x ∈ Γ) → (x ∈ (A ∷ (Γ - a)))
-+a-aT n1 n2 = {!!}
++a-aT Z n2 = n2
++a-aT (S n) Z = S Z
++a-aT (S n) (S n') = x∷y∷s⊆y∷x∷s (S (+a-aT n n'))
 
 +a-a : ∀ {l} {A : Set l} {Γ} → (a : A ∈ Γ) → (Γ ⊆ (A ∷ (Γ - a)))
 +a-a n = +a-aT n
@@ -98,12 +100,14 @@ term-subst {A} {con y} n tf (Var y') = var-subst {A} {con y} n tf y'
 term-subst {A} {con y} n tf (y0 ∙ y1) = term-subst n tf y0 ∙ term-subst n tf y1
 term-subst {A} {y1 ↝ y2} {[]} () tf tt
 -- Here I REALLY NEED to pattern-match by tt! Or… mm… proof of tt is made by Λ constructor (because, in fact, we should substitute in {!!} second arg of Λ, check it)
-term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-subst {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf {!!})
+term-subst {A} {y1 ↝ y2} {x ∷ xs} {Γ'} n tf tt = Λ {y1} {y2} {y1 ∷ (((x ∷ xs) - n) ⊹ Γ')} Z (term-subst {A} {y2} {y1 ∷ x ∷ xs} {Γ'} (S n) tf (weaking {y1 ∷ x ∷ (xs ⊹ Γ')} {x ∷ (xs ⊹ Γ')} {y2} (λ x → S x) (tt ∙ Var {y1} {x ∷ (xs ⊹ Γ')} {!!})))
 --term-subst {A} {y ↝ y'} Z tf tt = Λ {!!} (term-subst Z tf {!!})
 --term-subst {A} {y ↝ y'} (S n) tf tt = Λ {!!} (term-subst (S n) tf {!!})
 
 subst : ∀ {A Γ σ} (a : A ∈ Γ) → Term (Γ - a) A → Term Γ σ → Term (Γ - a) σ
-subst {A} {Γ} {σ} a t1 t2 = term-subst {A} {σ} {[ A ]} {Γ - a} Z t1 (weaking (λ {x} b → {!+a-a ? ?!}) t2)
+subst {A} {.A ∷ xs} {σ} Z t1 t2 = term-subst {σ} {σ} {[ σ ]} {xs} Z (Λ Z t2 ∙ t1) (Var Z)
+subst {A} {y ∷ xs} {σ} (S n) t1 t2 = term-subst {σ} {σ} {σ ∷ []} {y ∷ xs - n} Z (Λ (S n) t2 ∙ t1) (Var Z)
+subst {A} {[]} () t1 t2
 
 data Redex : {Γ : TList} {A : Type} → (Term Γ A) → Set where
   this   : ∀ {A σ Γ} (a : σ ∈ Γ) → (t₁ : Term Γ A) → (t₂ : Term (Γ - a) σ) → Redex ((Λ a t₁) ∙ t₂)
@@ -191,7 +195,11 @@ lemma2 (substℓ y y') = redexLast (join (skipthProof' (lemma2 y)) (lemma2 y'))
 
 -- 2006 - page 13, lemma 1.4.2 (iii)
 lemma3 : ∀ {σ A Γ} {a : σ ∈ Γ} {t₁ t₂ : Term Γ A} {p₁ p₂ : Term (Γ - a) σ} → t₁ ↠ℓ t₂ → p₁ ↠ℓ p₂ → (subst a p₁ t₁) ↠ℓ (subst a p₂ t₂)
-lemma3 t p = {!!}
+lemma3 (consℓ Z) p = {!!}
+lemma3 (consℓ (S n)) p = {!!}
+lemma3 (Λℓ y) p = {!!} -- Λℓ (consℓterm (subst {!!} {!!} {!!}))
+lemma3 (∙ℓ y y') p = {!!}
+lemma3 (substℓ y y') p = {!!}
 
 _* : ∀ {Γ A} → Term Γ A → Term Γ A
 Var y * = Var y
@@ -212,7 +220,7 @@ lemma4 (substℓ y y') = lemma3 (lemma4 y) (lemma4 y')
 ℓ-trans (consℓ a) b = b
 ℓ-trans (Λℓ y) (Λℓ y') = Λℓ (ℓ-trans y y')
 ℓ-trans (∙ℓ y y') (∙ℓ y0 y1) = ∙ℓ (ℓ-trans y y0) (ℓ-trans y' y1)
-ℓ-trans (∙ℓ y y') (substℓ y0 y1) = {!!}
+ℓ-trans (∙ℓ y y') (substℓ y0 y1) = substℓ {!!} {!!}
 ℓ-trans (substℓ y y') b = {!!}
 
 conv↠β↠ℓ : ∀ {Γ A} {t1 t2 : Term Γ A} → t1 ↠β t2 → t1 ↠ℓ t2
